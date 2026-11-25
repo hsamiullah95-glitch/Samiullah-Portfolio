@@ -1,0 +1,1671 @@
+
+/* =========================================
+   SAMIULLAH HAKIMI - ADMIN DASHBOARD
+   Complete Responsive Design
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+.sh-admin {
+  --bg: #0b1120;
+  --sidebar: #111a2d;
+  --card: #151f35;
+  --card-light: #1b2842;
+  --border: #283752;
+  --text: #edf2ff;
+  --muted: #93a1bd;
+  --primary: #7165ee;
+  --blue: #438cf2;
+
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sh-admin .sh-sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+
+.sh-admin .sh-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 5px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sh-admin .sh-brand-logo {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: white;
+  font-weight: 800;
+  font-size: 16px;
+  background: linear-gradient(135deg, #7165ee, #3986ed);
+}
+
+.sh-admin .sh-brand h2 {
+  font-size: 17px;
+  margin: 0 0 4px;
+  letter-spacing: 1.5px;
+}
+
+.sh-admin .sh-brand span {
+  font-size: 9px;
+  color: #8998b9;
+  letter-spacing: 2px;
+}
+
+.sh-admin .sh-close-sidebar {
+  display: none;
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.sh-admin .sh-admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sh-admin .sh-profile-avatar {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  position: relative;
+}
+
+.sh-admin .sh-profile-avatar img,
+.sh-admin .sh-top-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.sh-admin .sh-profile-avatar img {
+  border: 2px solid #7165ee;
+}
+
+.sh-admin .sh-avatar-online {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  right: 0;
+  bottom: 2px;
+  border: 2px solid var(--sidebar);
+  border-radius: 50%;
+  background: #26d69a;
+}
+
+.sh-admin .sh-profile-info {
+  min-width: 0;
+}
+
+.sh-admin .sh-profile-info strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+
+.sh-admin .sh-profile-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #a2b0ca;
+  font-size: 11px;
+}
+
+.sh-admin .sh-profile-info i,
+.sh-admin .sh-live-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #25d69a;
+}
+
+.sh-admin .sh-sidebar-label {
+  color: #7585a5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 23px 10px 12px;
+}
+
+.sh-admin .sh-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sh-admin .sh-nav-item {
+  width: 100%;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border: none;
+  border-radius: 9px;
+  color: #aab7d1;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.sh-admin .sh-nav-item svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.sh-admin .sh-nav-item:hover,
+.sh-admin .sh-nav-active {
+  color: white;
+  background: linear-gradient(100deg, #6658e8, #435fc0);
+}
+
+.sh-admin .sh-message-count {
+  margin-left: auto;
+  padding: 3px 7px;
+  border-radius: 20px;
+  color: white;
+  background: #e34e76;
+  font-size: 10px;
+}
+
+.sh-admin .sh-sidebar-bottom {
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.sh-admin .sh-security-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 10px;
+  border: 1px solid #293b5d;
+  border-radius: 10px;
+  background: #172640;
+  color: #8a9dff;
+}
+
+.sh-admin .sh-security-card strong {
+  display: block;
+  font-size: 12px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.sh-admin .sh-security-card span {
+  font-size: 10px;
+  color: #93a1bd;
+}
+
+.sh-admin .sh-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px;
+  margin-top: 12px;
+  color: #ff8c9f;
+  background: #392331;
+  border: 1px solid #593143;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sh-admin .sh-logout:hover {
+  background: #593143;
+}
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.sh-admin .sh-main {
+  width: calc(100% - 260px);
+  min-height: 100vh;
+  margin-left: 260px;
+  min-width: 0;
+}
+
+.sh-admin .sh-topbar {
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 30px;
+  background: #111a2d;
+  border-bottom: 1px solid var(--border);
+}
+
+.sh-admin .sh-topbar-left,
+.sh-admin .sh-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.sh-admin .sh-topbar-left h2 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.sh-admin .sh-topbar-left p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.sh-admin .sh-menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: white;
+  cursor: pointer;
+}
+
+.sh-admin .sh-icon-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: #1b2943;
+  border: 1px solid var(--border);
+  color: #c9d4ef;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.sh-admin .sh-notification-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  background: #ff6588;
+  border-radius: 50%;
+}
+
+.sh-admin .sh-top-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sh-admin .sh-top-avatar {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+}
+
+.sh-admin .sh-top-avatar img {
+  border: 2px solid #7165ee;
+}
+
+.sh-admin .sh-top-user-info strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.sh-admin .sh-top-user-info span {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.sh-admin .sh-content {
+  padding: 25px 30px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sh-admin .sh-welcome {
+  position: relative;
+  min-height: 225px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 30px;
+  overflow: hidden;
+  border: 1px solid #34436a;
+  border-radius: 17px;
+  background: linear-gradient(115deg, #252c68, #273e72 60%, #28558b);
+}
+
+.sh-admin .sh-welcome-text {
+  position: relative;
+  z-index: 2;
+  max-width: 550px;
+}
+
+.sh-admin .sh-welcome-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #aeb8ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.sh-admin .sh-welcome h1 {
+  font-size: 29px;
+  margin: 16px 0 10px;
+  color: white;
+}
+
+.sh-admin .sh-welcome h1 span {
+  color: #b5c5ff;
+}
+
+.sh-admin .sh-welcome-text > p {
+  max-width: 480px;
+  color: #d0d8f1;
+  line-height: 1.7;
+  font-size: 13px;
+  margin: 0;
+}
+
+.sh-admin .sh-welcome-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sh-admin .sh-primary-button,
+.sh-admin .sh-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sh-admin .sh-primary-button {
+  color: #27316b;
+  background: white;
+  border: none;
+}
+
+.sh-admin .sh-secondary-button {
+  color: white;
+  background: #ffffff16;
+  border: 1px solid #ffffff55;
+}
+
+.sh-admin .sh-welcome-visual {
+  width: 220px;
+  height: 190px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.sh-admin .sh-visual-circle {
+  position: absolute;
+  border: 1px solid #ffffff35;
+  border-radius: 50%;
+}
+
+.sh-admin .sh-circle-one {
+  width: 170px;
+  height: 170px;
+}
+
+.sh-admin .sh-circle-two {
+  width: 125px;
+  height: 125px;
+}
+
+.sh-admin .sh-visual-icon {
+  position: relative;
+  z-index: 1;
+  width: 95px;
+  height: 95px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: #ffffff22;
+  border: 1px solid #ffffff55;
+  border-radius: 25px;
+}
+
+.sh-admin .sh-visual-label {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  color: white;
+  background: #152f65;
+  border: 1px solid #ffffff35;
+  border-radius: 20px;
+  font-size: 10px;
+}
+
+/* =========================================
+   STATISTICS
+========================================= */
+
+.sh-admin .sh-stats-section,
+.sh-admin .sh-quick-section {
+  margin-top: 30px;
+}
+
+.sh-admin .sh-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.sh-admin .sh-section-heading h2 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.sh-admin .sh-section-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sh-admin .sh-live-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid #275345;
+  background: #14342e;
+  color: #65dcb4;
+  border-radius: 20px;
+  font-size: 10px;
+}
+
+.sh-admin .sh-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sh-admin .sh-stat-card {
+  padding: 19px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--card);
+  min-width: 0;
+}
+
+.sh-admin .sh-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sh-admin .sh-stat-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.sh-admin .sh-purple .sh-stat-icon {
+  color: #a89cff;
+  background: #352b66;
+}
+
+.sh-admin .sh-blue .sh-stat-icon {
+  color: #75b8ff;
+  background: #203c65;
+}
+
+.sh-admin .sh-orange .sh-stat-icon {
+  color: #ffbd82;
+  background: #60412c;
+}
+
+.sh-admin .sh-green .sh-stat-icon {
+  color: #6ee0b5;
+  background: #1d4b42;
+}
+
+.sh-admin .sh-stat-more {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: none;
+  border-radius: 8px;
+  color: #aab8d7;
+  background: #24324e;
+  cursor: pointer;
+}
+
+.sh-admin .sh-stat-card h3 {
+  margin: 17px 0 5px;
+  font-size: 27px;
+}
+
+.sh-admin .sh-stat-card > strong {
+  font-size: 12px;
+}
+
+.sh-admin .sh-stat-card > p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* =========================================
+   QUICK MANAGEMENT
+========================================= */
+
+.sh-admin .sh-module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sh-admin .sh-module-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sh-admin .sh-module-card:hover {
+  transform: translateY(-3px);
+  border-color: #7165ee;
+  background: #1b2943;
+}
+
+.sh-admin .sh-module-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.sh-admin .purple-bg {
+  color: #b5a9ff;
+  background: #352b66;
+}
+
+.sh-admin .blue-bg {
+  color: #8bc6ff;
+  background: #203c65;
+}
+
+.sh-admin .orange-bg {
+  color: #ffbd82;
+  background: #60412c;
+}
+
+.sh-admin .green-bg {
+  color: #6ee0b5;
+  background: #1d4b42;
+}
+
+.sh-admin .pink-bg {
+  color: #ff9ec6;
+  background: #592e50;
+}
+
+.sh-admin .cyan-bg {
+  color: #77dcf5;
+  background: #17475a;
+}
+
+.sh-admin .sh-module-card h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+}
+
+.sh-admin .sh-module-card p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sh-admin .sh-module-arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #8799c4;
+}
+
+.sh-admin .sh-admin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 0 5px;
+  margin-top: 25px;
+  border-top: 1px solid var(--border);
+  color: #8492ae;
+  font-size: 10px;
+}
+
+.sh-admin .sh-admin-footer p {
+  margin: 0;
+}
+
+.sh-admin .sh-admin-footer strong {
+  color: #cbd5ee;
+}
+
+.sh-admin .sh-footer-dot {
+  color: #2bd69b;
+}
+
+/* =========================================
+   SERVICES MANAGEMENT
+========================================= */
+
+.sh-admin .sh-services-page {
+  width: 100%;
+  padding: 27px 30px;
+  color: var(--text);
+}
+
+.sh-admin .sh-services-heading,
+.sh-admin .sh-services-list-heading,
+.sh-admin .sh-service-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.sh-admin .sh-services-heading h1 {
+  font-size: 25px;
+  margin: 14px 0 7px;
+}
+
+.sh-admin .sh-services-heading p,
+.sh-admin .sh-services-list-heading p,
+.sh-admin .sh-service-form-heading p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 12px;
+}
+
+.sh-admin .sh-services-heading-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sh-admin .sh-service-add,
+.sh-admin .sh-service-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: none;
+  cursor: pointer;
+  border-radius: 9px;
+  padding: 11px 15px;
+  color: white;
+  background: linear-gradient(135deg, #6658e8, #3986ed);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sh-admin .sh-service-refresh {
+  padding: 11px;
+  background: #202a45;
+}
+
+.sh-admin .sh-service-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 25px 0;
+}
+
+.sh-admin .sh-service-summary-card {
+  position: relative;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.sh-admin .sh-service-summary-card span {
+  display: block;
+  color: #a6b1cc;
+  font-size: 12px;
+}
+
+.sh-admin .sh-service-summary-card strong {
+  display: block;
+  font-size: 26px;
+  margin-top: 10px;
+}
+
+.sh-admin .sh-service-summary-card svg {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 23px;
+  height: 23px;
+  color: #7187ff;
+}
+
+.sh-admin .sh-service-form,
+.sh-admin .sh-services-list {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 22px;
+}
+
+.sh-admin .sh-service-form-heading h2,
+.sh-admin .sh-services-list-heading h2 {
+  margin: 0 0 7px;
+  font-size: 18px;
+}
+
+.sh-admin .sh-service-close {
+  display: grid;
+  place-items: center;
+  border: none;
+  background: #26324d;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sh-admin .sh-service-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.sh-admin .sh-service-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sh-admin .sh-service-field label {
+  color: #cbd5ee;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sh-admin .sh-service-field input,
+.sh-admin .sh-service-field textarea,
+.sh-admin .sh-service-field select {
+  width: 100%;
+  background: #0e172b;
+  color: white;
+  border: 1px solid #34415e;
+  border-radius: 8px;
+  padding: 11px 13px;
+  outline: none;
+  font: inherit;
+  font-size: 12px;
+}
+
+.sh-admin .sh-service-field input:focus,
+.sh-admin .sh-service-field textarea:focus,
+.sh-admin .sh-service-field select:focus {
+  border-color: #7280ff;
+}
+
+.sh-admin .sh-service-field textarea {
+  resize: vertical;
+}
+
+.sh-admin .sh-service-full {
+  grid-column: 1 / -1;
+}
+
+.sh-admin .sh-service-form-buttons {
+  display: flex;
+  gap: 11px;
+  margin-top: 21px;
+}
+
+.sh-admin .sh-service-save,
+.sh-admin .sh-service-cancel {
+  padding: 11px 17px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sh-admin .sh-service-save {
+  background: #6559e9;
+  color: white;
+}
+
+.sh-admin .sh-service-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sh-admin .sh-service-cancel {
+  background: #303b54;
+  color: white;
+}
+
+.sh-admin .sh-services-list-heading {
+  margin-bottom: 20px;
+}
+
+.sh-admin .sh-services-list-heading > span {
+  background: #263452;
+  color: #aebeff;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+}
+
+.sh-admin .sh-services-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.sh-admin .sh-services-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.sh-admin .sh-services-table th {
+  text-align: left;
+  color: #9caaca;
+  font-size: 11px;
+  background: #10192e;
+  padding: 13px;
+}
+
+.sh-admin .sh-services-table td {
+  padding: 14px 13px;
+  border-bottom: 1px solid #293650;
+  color: #dce4fa;
+  font-size: 12px;
+}
+
+.sh-admin .sh-service-description {
+  max-width: 260px;
+  overflow-wrap: anywhere;
+}
+
+.sh-admin .sh-service-active,
+.sh-admin .sh-service-inactive {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.sh-admin .sh-service-active {
+  background: #123e35;
+  color: #58e0ad;
+}
+
+.sh-admin .sh-service-inactive {
+  background: #48302a;
+  color: #ffb18c;
+}
+
+.sh-admin .sh-service-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.sh-admin .sh-service-edit,
+.sh-admin .sh-service-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  color: white;
+}
+
+.sh-admin .sh-service-edit {
+  background: #344c91;
+}
+
+.sh-admin .sh-service-delete {
+  background: #873c4c;
+}
+
+.sh-admin .sh-services-empty {
+  text-align: center;
+  padding: 45px 20px;
+  color: #aab6d1;
+}
+
+.sh-admin .sh-services-empty > svg {
+  width: 36px;
+  height: 36px;
+  color: #7886ff;
+}
+
+.sh-admin .sh-services-empty h3 {
+  color: white;
+  margin: 14px 0 8px;
+  font-size: 17px;
+}
+
+.sh-admin .sh-services-empty p {
+  margin-bottom: 18px;
+  font-size: 12px;
+}
+
+.sh-admin .sh-services-empty button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #6559e9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sh-admin .sh-service-error {
+  background: #4a242e;
+  color: #ffb4c0;
+  padding: 13px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 12px;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.sh-admin .sh-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: white;
+  text-align: center;
+}
+
+.sh-admin .sh-loading h3 {
+  font-size: 17px;
+  margin: 17px 0 7px;
+}
+
+.sh-admin .sh-loading p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sh-admin .sh-loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #293650;
+  border-top-color: #7165ee;
+  border-radius: 50%;
+  animation: sh-spin 0.8s linear infinite;
+}
+
+@keyframes sh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   MOBILE SIDEBAR
+========================================= */
+
+.sh-admin .sh-sidebar-overlay {
+  display: none;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 1100px) {
+  .sh-admin .sh-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sh-admin .sh-module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sh-admin .sh-content {
+    padding: 22px;
+  }
+
+  .sh-admin .sh-topbar {
+    padding: 12px 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sh-admin .sh-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sh-admin .sh-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sh-admin .sh-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: #0009;
+  }
+
+  .sh-admin .sh-close-sidebar {
+    display: block;
+  }
+
+  .sh-admin .sh-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .sh-admin .sh-menu-button {
+    display: flex;
+  }
+
+  .sh-admin .sh-topbar {
+    padding: 11px 15px;
+  }
+
+  .sh-admin .sh-topbar-left {
+    gap: 10px;
+  }
+
+  .sh-admin .sh-top-user-info {
+    display: none;
+  }
+
+  .sh-admin .sh-content {
+    padding: 16px;
+  }
+
+  .sh-admin .sh-welcome {
+    padding: 23px;
+    min-height: auto;
+  }
+
+  .sh-admin .sh-welcome-visual {
+    display: none;
+  }
+
+  .sh-admin .sh-welcome h1 {
+    font-size: 24px;
+  }
+
+  .sh-admin .sh-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .sh-admin .sh-stat-card {
+    padding: 14px;
+  }
+
+  .sh-admin .sh-module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-admin .sh-admin-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sh-admin .sh-services-page {
+    padding: 18px 15px;
+  }
+
+  .sh-admin .sh-services-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sh-admin .sh-service-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-admin .sh-service-input-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-admin .sh-service-full {
+    grid-column: auto;
+  }
+
+  .sh-admin .sh-services-list,
+  .sh-admin .sh-service-form {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sh-admin .sh-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-admin .sh-topbar-left h2 {
+    font-size: 14px;
+  }
+
+  .sh-admin .sh-topbar-left p {
+    font-size: 9px;
+  }
+
+  .sh-admin .sh-services-heading-actions {
+    width: 100%;
+  }
+
+  .sh-admin .sh-service-add {
+    flex: 1;
+  }
+
+  .sh-admin .sh-services-list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Messages Management */
+.sh-messages-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+.sh-messages-head h2{margin:0 0 7px;color:var(--sh-text,#fff)}
+.sh-messages-head p{margin:0;color:var(--sh-muted,#9ca3af)}
+.sh-messages-refresh,.sh-message-modal-actions button,.sh-message-modal-actions a{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#202938;color:#fff;text-decoration:none;cursor:pointer}
+.sh-messages-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.sh-messages-stats>div{padding:20px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.035)}
+.sh-messages-stats strong,.sh-messages-stats span{display:block}
+.sh-messages-stats strong{font-size:27px;color:#fff}
+.sh-messages-stats span{margin-top:5px;color:#9ca3af;font-size:13px}
+.sh-messages-search{display:flex;align-items:center;gap:10px;padding:0 14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.12);border-radius:11px;background:#151e2b;color:#9ca3af}
+.sh-messages-search input{width:100%;padding:14px 0;border:0;outline:0;background:transparent;color:#fff}
+.sh-messages-list{display:grid;gap:12px}
+.sh-message-card{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:17px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.025)}
+.sh-message-card.unread{border-left:3px solid #39b8ef;background:rgba(57,184,239,.055)}
+.sh-message-main{display:flex;align-items:flex-start;gap:13px;min-width:0;flex:1;cursor:pointer}
+.sh-message-icon{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:11px;background:rgba(57,184,239,.13);color:#48c3f1}
+.sh-message-info{min-width:0}
+.sh-message-title{display:flex;align-items:center;gap:9px;color:#fff}
+.sh-message-title span{padding:3px 7px;border-radius:5px;background:#174d65;color:#7bdcff;font-size:10px}
+.sh-message-info small,.sh-message-info time{display:block;margin-top:5px;color:#9ca3af}
+.sh-message-info p{overflow:hidden;margin:8px 0;color:#c5cbd5;text-overflow:ellipsis;white-space:nowrap}
+.sh-message-info time{font-size:11px}
+.sh-message-actions{display:flex;gap:7px}
+.sh-message-actions button,.sh-message-close{display:grid;place-items:center;width:37px;height:37px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:#202938;color:#dce5ef;cursor:pointer}
+.sh-message-actions button:last-child{color:#ff7777}
+.sh-messages-empty{padding:35px;text-align:center;color:#aab4c3}
+.sh-messages-error{padding:12px;margin-bottom:15px;border-radius:9px;background:rgba(220,60,60,.12);color:#ff9a9a}
+.sh-message-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.72)}
+.sh-message-modal{position:relative;width:min(620px,100%);max-height:85vh;overflow:auto;padding:28px;border:1px solid rgba(255,255,255,.12);border-radius:17px;background:#172231;color:#eaf0f7}
+.sh-message-modal h2{margin:0 40px 20px 0}
+.sh-message-close{position:absolute;right:17px;top:17px}
+.sh-message-body{margin:20px 0;padding:18px;border-radius:10px;background:#101925;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.sh-message-modal-actions{display:flex;flex-wrap:wrap;gap:9px}
+@media(max-width:650px){.sh-messages-head{align-items:flex-start;flex-direction:column}.sh-messages-stats{gap:8px}.sh-messages-stats>div{padding:13px}.sh-messages-stats strong{font-size:21px}.sh-message-card{align-items:flex-start}.sh-message-info p{max-width:190px}.sh-message-actions{flex-direction:column}}
+
+/* =====================================
+   HOME PAGE MANAGEMENT
+===================================== */
+
+.home-management-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 18px;
+  padding: 25px;
+  margin-top: 22px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.045);
+}
+
+.home-management-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.home-management-heading-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: rgba(249, 115, 22, 0.11);
+  color: #f97316;
+  flex-shrink: 0;
+}
+
+.home-management-card-heading h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+  color: var(--text-primary, #172033);
+}
+
+.home-management-card-heading p,
+.home-image-upload-info p {
+  margin: 0;
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.home-image-upload {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  margin-bottom: 22px;
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: 14px;
+  background: var(--background-secondary, #f8fafc);
+}
+
+.home-image-preview {
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #e2e8f0;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.home-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-image-upload-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.home-image-upload-info strong {
+  color: var(--text-primary, #172033);
+  font-size: 15px;
+}
+
+.home-upload-button,
+.home-save-button,
+.home-reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.home-upload-button {
+  background: #fff1e8;
+  color: #ea580c;
+}
+
+.home-upload-button:hover {
+  background: #ffdfca;
+}
+
+.home-json-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-primary, #172033);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.home-json-editor {
+  display: block;
+  width: 100%;
+  min-height: 520px;
+  resize: vertical;
+  padding: 18px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  outline: none;
+  background: #101827;
+  color: #d8e6f5;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+.home-json-editor:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.home-json-help {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 13px;
+  border-radius: 9px;
+  background: var(--background-secondary, #f8fafc);
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.home-json-help strong {
+  color: var(--text-primary, #172033);
+}
+
+.home-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.home-save-button {
+  background: #f97316;
+  color: #fff;
+}
+
+.home-save-button:hover {
+  background: #ea580c;
+}
+
+.home-reset-button {
+  background: var(--background-secondary, #f1f5f9);
+  color: var(--text-primary, #334155);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.home-save-button:disabled,
+.home-reset-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.home-editor-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.home-editor-message.success {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.home-editor-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.home-editor-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 25px 0;
+  color: var(--text-secondary, #64748b);
+}
+
+@media (max-width: 600px) {
+  .home-management-card {
+    padding: 15px;
+  }
+
+  .home-image-upload {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-json-editor {
+    min-height: 420px;
+    font-size: 12px;
+    padding: 12px;
+  }
+}
+
+/* ===== Premium Services Table Design ===== */
+
+.sh-admin .sh-services-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #293957;
+  border-radius: 14px;
+  background: #111c32;
+}
+
+.sh-admin .sh-services-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.sh-admin .sh-services-table th {
+  padding: 17px 16px;
+  background: #192640;
+  color: #aebde0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.sh-admin .sh-services-table td {
+  padding: 17px 16px;
+  border-bottom: 1px solid #293957;
+  color: #e0e8fa;
+  font-size: 13px;
+  vertical-align: middle;
+  transition: background .2s ease;
+}
+
+.sh-admin .sh-services-table tbody tr:hover td {
+  background: #1a2944;
+}
+
+.sh-admin .sh-services-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sh-admin .sh-service-description {
+  max-width: 280px;
+  color: #aab8d4;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.sh-admin .sh-service-active,
+.sh-admin .sh-service-inactive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sh-admin .sh-service-active {
+  background: rgba(16, 185, 129, .14);
+  color: #52e3b0;
+  border: 1px solid rgba(16, 185, 129, .25);
+}
+
+.sh-admin .sh-service-inactive {
+  background: rgba(249, 115, 22, .13);
+  color: #ffb18c;
+  border: 1px solid rgba(249, 115, 22, .25);
+}
+
+.sh-admin .sh-service-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sh-admin .sh-service-edit,
+.sh-admin .sh-service-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  color: white;
+  transition: all .2s ease;
+}
+
+.sh-admin .sh-service-edit {
+  background: #344c91;
+  border-color: #4967b5;
+}
+
+.sh-admin .sh-service-edit:hover {
+  background: #4967b5;
+  transform: translateY(-2px);
+}
+
+.sh-admin .sh-service-delete {
+  background: #873c4c;
+  border-color: #a84d60;
+}
+
+.sh-admin .sh-service-delete:hover {
+  background: #a84d60;
+  transform: translateY(-2px);
+}
+
+.sh-admin .sh-services-empty {
+  text-align: center;
+  padding: 45px 20px;
+  color: #aab6d1;
+}
+
+.sh-admin .sh-services-empty > svg {
+  width: 36px;
+  height: 36px;
+  color: #7886ff;
+}
+
+@media (max-width: 650px) {
+  .sh-admin .sh-services-table th,
+  .sh-admin .sh-services-table td {
+    padding: 13px 11px;
+  }
+
+  .sh-admin .sh-service-description {
+    max-width: 200px;
+  }
+}
+
+/* ===== End Premium Services Table Design ===== */
+

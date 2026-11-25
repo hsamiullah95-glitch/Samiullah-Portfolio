@@ -1,0 +1,593 @@
+
+import { useEffect, useState } from "react";
+
+import {
+  FolderKanban,
+  Plus,
+  Pencil,
+  Trash2,
+  RefreshCw,
+  X,
+  Upload,
+  ExternalLink,
+  ShieldCheck,
+  Activity,
+  Image as ImageIcon
+} from "lucide-react";
+
+import "./PortfolioManagement.css";
+
+const API = "http://localhost:8000/api/projects.php";
+const SERVER = "http://localhost:8000/";
+
+const emptyForm = {
+  title: "",
+  description: "",
+  project_url: "",
+  is_active: 1
+};
+
+export default function PortfolioManagement() {
+  const [projects, setProjects] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
+  const [editingId, setEditingId] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  async function loadProjects() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(API, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not load projects.");
+      }
+
+      setProjects(Array.isArray(result.data) ? result.data : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  function resetForm() {
+    setForm({ ...emptyForm });
+    setImage(null);
+    setPreview("");
+    setEditingId(null);
+    setShowForm(false);
+  }
+
+  function handleAdd() {
+    setError("");
+    setSuccess("");
+    setForm({ ...emptyForm });
+    setImage(null);
+    setPreview("");
+    setEditingId(null);
+    setShowForm(true);
+  }
+
+  function handleEdit(project) {
+    setError("");
+    setSuccess("");
+
+    setEditingId(project.id);
+
+    setForm({
+      title: project.title || "",
+      description: project.description || "",
+      project_url: project.project_url || "",
+      is_active: Number(project.is_active)
+    });
+
+    setImage(null);
+    setPreview(
+      project.image
+        ? SERVER + project.image
+        : ""
+    );
+
+    setShowForm(true);
+  }
+
+  function handleImageChange(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Only JPG, PNG and WEBP images are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be smaller than 5MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setError("");
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const formData = new FormData();
+
+      formData.append("title", form.title.trim());
+      formData.append("description", form.description.trim());
+      formData.append("project_url", form.project_url.trim());
+      formData.append("is_active", String(form.is_active));
+
+      if (editingId) {
+        formData.append("id", String(editingId));
+      }
+
+      if (image) {
+        formData.append("image", image);
+      }
+
+      const response = await fetch(API, {
+        method: "POST",
+        credentials: "include",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not save project.");
+      }
+
+      setSuccess(result.message || "Project saved successfully.");
+
+      resetForm();
+      await loadProjects();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(project) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${project.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch(API, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          id: project.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not delete project.");
+      }
+
+      setSuccess(result.message || "Project deleted successfully.");
+      await loadProjects();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  const activeCount = projects.filter(
+    project => Number(project.is_active) === 1
+  ).length;
+
+  const inactiveCount = projects.length - activeCount;
+
+  return (
+    <div className="sh-content">
+      <section className="sh-portfolio-admin">
+
+        {/* HEADER */}
+
+        <div className="sh-portfolio-heading">
+          <div>
+            <span className="sh-welcome-tag">
+              <FolderKanban size={14} />
+              PORTFOLIO CONTROL
+            </span>
+
+            <h1>Portfolio Management</h1>
+            <p>Manage your projects, images and project links.</p>
+          </div>
+
+          <div className="sh-portfolio-heading-actions">
+            <button
+              type="button"
+              className="sh-portfolio-refresh"
+              onClick={loadProjects}
+              title="Refresh"
+            >
+              <RefreshCw size={18} />
+            </button>
+
+            <button
+              type="button"
+              className="sh-portfolio-add"
+              onClick={handleAdd}
+            >
+              <Plus size={19} />
+              Add New Project
+            </button>
+          </div>
+        </div>
+
+        {/* STATISTICS */}
+
+        <div className="sh-portfolio-summary">
+
+          <div className="sh-portfolio-summary-card">
+            <span>Total Projects</span>
+            <strong>{projects.length}</strong>
+            <FolderKanban size={25} />
+          </div>
+
+          <div className="sh-portfolio-summary-card">
+            <span>Active Projects</span>
+            <strong>{activeCount}</strong>
+            <ShieldCheck size={25} />
+          </div>
+
+          <div className="sh-portfolio-summary-card">
+            <span>Inactive Projects</span>
+            <strong>{inactiveCount}</strong>
+            <Activity size={25} />
+          </div>
+
+        </div>
+
+        {/* NOTIFICATIONS */}
+
+        {error && (
+          <div className="sh-portfolio-error">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="sh-portfolio-success">
+            {success}
+          </div>
+        )}
+
+        {/* ADD / EDIT FORM */}
+
+        {showForm && (
+          <form
+            className="sh-portfolio-form"
+            onSubmit={handleSubmit}
+          >
+
+            <div className="sh-portfolio-form-heading">
+              <div>
+                <h2>
+                  {editingId ? "Edit Project" : "Add New Project"}
+                </h2>
+                <p>Enter your project information below.</p>
+              </div>
+
+              <button
+                type="button"
+                className="sh-portfolio-close"
+                onClick={resetForm}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="sh-portfolio-input-grid">
+
+              <div className="sh-portfolio-field">
+                <label>Project Title *</label>
+
+                <input
+                  type="text"
+                  placeholder="Example: University Management System"
+                  value={form.title}
+                  onChange={e =>
+                    setForm({ ...form, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="sh-portfolio-field">
+                <label>Project URL</label>
+
+                <input
+                  type="url"
+                  placeholder="https://example.com"
+                  value={form.project_url}
+                  onChange={e =>
+                    setForm({ ...form, project_url: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="sh-portfolio-field sh-portfolio-full">
+                <label>Project Description</label>
+
+                <textarea
+                  rows="5"
+                  placeholder="Write about your project..."
+                  value={form.description}
+                  onChange={e =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="sh-portfolio-field">
+                <label>Project Status</label>
+
+                <select
+                  value={form.is_active}
+                  onChange={e =>
+                    setForm({
+                      ...form,
+                      is_active: Number(e.target.value)
+                    })
+                  }
+                >
+                  <option value={1}>Active</option>
+                  <option value={0}>Inactive</option>
+                </select>
+              </div>
+
+              <div className="sh-portfolio-field sh-portfolio-full">
+                <label>Project Image (JPG, PNG, WEBP - Max 5MB)</label>
+
+                <label className="sh-portfolio-upload">
+                  <Upload size={22} />
+                  <span>
+                    {image ? image.name : "Choose Project Image"}
+                  </span>
+
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageChange}
+                  />
+                </label>
+
+                {preview && (
+                  <div className="sh-portfolio-preview">
+                    <img src={preview} alt="Project preview" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImage(null);
+                        setPreview("");
+                      }}
+                    >
+                      <X size={16} />
+                      Remove Preview
+                    </button>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            <div className="sh-portfolio-form-buttons">
+
+              <button
+                type="submit"
+                className="sh-portfolio-save"
+                disabled={saving}
+              >
+                {saving
+                  ? "Saving..."
+                  : editingId
+                    ? "Update Project"
+                    : "Save Project"}
+              </button>
+
+              <button
+                type="button"
+                className="sh-portfolio-cancel"
+                onClick={resetForm}
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+        )}
+
+        {/* PROJECT LIST */}
+
+        <div className="sh-portfolio-list">
+
+          <div className="sh-portfolio-list-heading">
+            <div>
+              <h2>All Projects</h2>
+              <p>View and manage your portfolio projects.</p>
+            </div>
+
+            <span>{projects.length} Projects</span>
+          </div>
+
+          {loading ? (
+            <div className="sh-portfolio-empty">
+              <RefreshCw size={32} />
+              <h3>Loading Projects...</h3>
+              <p>Please wait a moment.</p>
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="sh-portfolio-empty">
+              <FolderKanban size={43} />
+              <h3>No Projects Found</h3>
+              <p>You have not added any projects yet.</p>
+
+              <button
+                type="button"
+                onClick={handleAdd}
+              >
+                <Plus size={17} />
+                Add Your First Project
+              </button>
+            </div>
+          ) : (
+            <div className="sh-portfolio-table-wrap">
+
+              <table className="sh-portfolio-table">
+
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Image</th>
+                    <th>Project Title</th>
+                    <th>Description</th>
+                    <th>Project Link</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {projects.map((project, index) => (
+                    <tr key={project.id}>
+
+                      <td>{index + 1}</td>
+
+                      <td>
+                        <div className="sh-portfolio-table-image">
+                          {project.image ? (
+                            <img
+                              src={SERVER + project.image}
+                              alt={project.title}
+                            />
+                          ) : (
+                            <ImageIcon size={23} />
+                          )}
+                        </div>
+                      </td>
+
+                      <td>
+                        <strong>{project.title}</strong>
+                      </td>
+
+                      <td className="sh-portfolio-description">
+                        {project.description || "No description"}
+                      </td>
+
+                      <td>
+                        {project.project_url ? (
+                          <a
+                            href={project.project_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="sh-portfolio-link"
+                          >
+                            Visit <ExternalLink size={14} />
+                          </a>
+                        ) : (
+                          <span className="sh-portfolio-no-link">
+                            No link
+                          </span>
+                        )}
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            Number(project.is_active) === 1
+                              ? "sh-portfolio-active"
+                              : "sh-portfolio-inactive"
+                          }
+                        >
+                          {Number(project.is_active) === 1
+                            ? "Active"
+                            : "Inactive"}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="sh-portfolio-actions">
+
+                          <button
+                            type="button"
+                            className="sh-portfolio-edit"
+                            title="Edit"
+                            onClick={() => handleEdit(project)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="sh-portfolio-delete"
+                            title="Delete"
+                            onClick={() => handleDelete(project)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+            </div>
+          )}
+
+        </div>
+
+      </section>
+    </div>
+  );
+}

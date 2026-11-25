@@ -1,0 +1,658 @@
+
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Code2,
+  Database,
+  Network,
+  Palette,
+  Server,
+  Monitor,
+  Smartphone,
+  ShieldCheck,
+  ArrowUpRight,
+  CheckCircle2,
+  Sparkles,
+  Layers,
+  Zap,
+  RefreshCw,
+  MessageCircle,
+  Layout,
+  Globe,
+  
+  Cloud,
+  HardDrive,
+  Router,
+  Settings,
+} from "lucide-react";
+
+import "./Services.css";
+
+const API = "http://localhost:8001/api/services.php";
+
+const categories = [
+  {
+    id: "website-design",
+    number: "01",
+    title: "Website & UI/UX Design",
+    subtitle: "Beautiful experiences. Thoughtful interfaces.",
+    description:
+      "I design attractive, user-friendly and responsive digital experiences that make websites easy and enjoyable to use.",
+    icon: Palette,
+    tags: ["UI Design", "UX Design", "Figma", "Responsive Design"],
+  },
+  {
+    id: "web-development",
+    number: "02",
+    title: "Web Development",
+    subtitle: "Ideas transformed into working websites.",
+    description:
+      "From modern frontend interfaces to complete backend systems, I build practical websites and web applications.",
+    icon: Code2,
+    tags: ["React", "JavaScript", "PHP", "Web Applications"],
+  },
+  {
+    id: "networking-it",
+    number: "03",
+    title: "Networking & IT",
+    subtitle: "Reliable connections. Practical IT solutions.",
+    description:
+      "Networking and IT services for connected environments, including network setup, server configuration and CCTV systems.",
+    icon: Network,
+    tags: ["LAN / WAN", "Router & Switch", "Servers", "CCTV"],
+  },
+  {
+    id: "database-hosting",
+    number: "04",
+    title: "Database & Hosting",
+    subtitle: "Organized data. Reliable online presence.",
+    description:
+      "Database design, data management and hosting solutions that help websites and applications operate reliably.",
+    icon: Database,
+    tags: ["MySQL", "Database Design", "Web Hosting", "Backup"],
+  },
+];
+
+const iconOptions = {
+  code: Code2,
+  code2: Code2,
+  database: Database,
+  network: Network,
+  palette: Palette,
+  server: Server,
+  monitor: Monitor,
+  globe: Globe,
+  smartphone: Smartphone,
+  settings: Settings,
+  shield: ShieldCheck,
+  shieldcheck: ShieldCheck,
+  layers: Layers,
+  zap: Zap,
+  message: MessageCircle,
+  layout: Layout,
+  
+  cloud: Cloud,
+  harddrive: HardDrive,
+  router: Router,
+};
+
+const benefits = [
+  {
+    icon: ShieldCheck,
+    title: "Quality First",
+    text: "Careful work, organized structure and attention to detail.",
+  },
+  {
+    icon: Zap,
+    title: "Modern Solutions",
+    text: "Practical technologies selected for each project.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Clear Communication",
+    text: "A clear understanding of your goals and requirements.",
+  },
+];
+
+const process = [
+  ["01", "Discussion", "Understanding your idea and requirements."],
+  ["02", "Planning", "Organizing the structure and project goals."],
+  ["03", "Development", "Building and testing the solution."],
+  ["04", "Delivery", "Reviewing the work and preparing the result."],
+];
+
+function getServiceIcon(iconName, index) {
+  if (iconName) {
+    const key = String(iconName).toLowerCase().replace(/[^a-z]/g, "");
+    if (iconOptions[key]) return iconOptions[key];
+  }
+
+  const defaults = [Palette, Code2, Network, Database, Server, Monitor];
+  return defaults[index % defaults.length];
+}
+
+function getCategoryId(service) {
+  const raw = String(
+    service.category_slug ||
+    service.category ||
+    service.category_name ||
+    ""
+  )
+    .toLowerCase()
+    .trim()
+    .replace(/[_\s]+/g, "-");
+
+  const aliases = {
+    design: "website-design",
+    "website-design": "website-design",
+    "ui-ux": "website-design",
+    "ui-ux-design": "website-design",
+    "web-design": "website-design",
+
+    development: "web-development",
+    "web-development": "web-development",
+    programming: "web-development",
+
+    networking: "networking-it",
+    "networking-it": "networking-it",
+    it: "networking-it",
+
+    database: "database-hosting",
+    hosting: "database-hosting",
+    "database-hosting": "database-hosting",
+    "domain-hosting": "database-hosting",
+  };
+
+  if (aliases[raw]) return aliases[raw];
+
+  const title = `${service.title || ""} ${service.description || ""}`.toLowerCase();
+
+  if (
+    /ui.?ux|figma|user interface|user experience|web design|website design|wireframe|landing page/.test(title)
+  ) {
+    return "website-design";
+  }
+
+  if (
+    /react|javascript|php|frontend|backend|full.?stack|web development|website development|web application/.test(title)
+  ) {
+    return "web-development";
+  }
+
+  if (
+    /network|router|switch|cctv|lan|wan|server setup|it support|mikrotik/.test(title)
+  ) {
+    return "networking-it";
+  }
+
+  if (
+    /database|mysql|hosting|domain|backup|data management/.test(title)
+  ) {
+    return "database-hosting";
+  }
+
+  return "web-development";
+}
+
+export default function Services() {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadServices() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(API);
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Could not load services.");
+        }
+
+        const rows = Array.isArray(result.data) ? result.data : [];
+
+        if (isMounted) {
+          setServices(
+            rows.filter((service) => Number(service.is_active) === 1)
+          );
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(
+            "Services could not be loaded. Please check the server connection."
+          );
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadServices();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const groupedServices = useMemo(() => {
+    const groups = {};
+
+    categories.forEach((category) => {
+      groups[category.id] = [];
+    });
+
+    services.forEach((service) => {
+      const categoryId = getCategoryId(service);
+
+      if (groups[categoryId]) {
+        groups[categoryId].push(service);
+      }
+    });
+
+    return groups;
+  }, [services]);
+
+  return (
+    <div className="services-page">
+
+      {/* HERO */}
+      <section className="services-hero">
+        <div className="services-hero-glow services-glow-one" />
+        <div className="services-hero-glow services-glow-two" />
+
+        <div className="services-container services-hero-layout">
+          <div className="services-hero-content">
+            <div className="services-eyebrow">
+              <span className="services-eyebrow-line" />
+              WHAT I DO
+            </div>
+
+            <h1>
+              Creative Services.
+              <br />
+              <span>Real Solutions.</span>
+            </h1>
+
+            <p>
+              I turn ideas into useful digital experiences through creative
+              design, web development, networking, database and hosting
+              solutions.
+            </p>
+
+            <div className="services-hero-buttons">
+              <a href="#service-list" className="services-btn services-btn-primary">
+                Explore Services <ArrowUpRight size={18} />
+              </a>
+
+              <Link to="/contact" className="services-btn services-btn-outline">
+                Let's Talk <MessageCircle size={18} />
+              </Link>
+            </div>
+
+            <div className="services-hero-note">
+              <CheckCircle2 size={17} />
+              <span>Design Â· Development Â· Networking Â· Hosting</span>
+            </div>
+
+            <div className="services-hero-stats">
+              <div>
+                <strong>04</strong>
+                <span>Main Categories</span>
+              </div>
+              <div>
+                <strong>01</strong>
+                <span>Digital Vision</span>
+              </div>
+              <div>
+                <strong>100%</strong>
+                <span>Focus on Quality</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="services-hero-art">
+            <div className="services-art-orbit orbit-one" />
+            <div className="services-art-orbit orbit-two" />
+
+            <div className="services-art-card">
+              <div className="services-art-card-top">
+                <span className="services-art-dots">
+                  <i /><i /><i />
+                </span>
+                <span>MY DIGITAL WORKSPACE</span>
+                <Sparkles size={17} />
+              </div>
+
+              <div className="services-art-profile">
+                <div className="services-art-avatar">SH<span>.</span></div>
+                <div>
+                  <strong>Samiullah Hakimi</strong>
+                  <small>Web Developer & IT Enthusiast</small>
+                </div>
+              </div>
+
+              <div className="services-art-divider" />
+              <div className="services-art-label">MY EXPERTISE</div>
+
+              {categories.map((category) => {
+                const Icon = category.icon;
+
+                return (
+                  <a
+                    href={`#${category.id}`}
+                    className="services-art-item"
+                    key={category.id}
+                  >
+                    <span className="art-icon"><Icon size={20} /></span>
+                    <div>
+                      <strong>{category.title}</strong>
+                      <small>{category.subtitle}</small>
+                    </div>
+                    <ArrowUpRight size={17} />
+                  </a>
+                );
+              })}
+
+              <div className="services-art-footer">
+                <span><i /> DIGITAL SOLUTIONS</span>
+                <span>01 â€” 04</span>
+              </div>
+            </div>
+
+            <div className="services-floating-tag">
+              <Sparkles size={17} />
+              Ideas into reality
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INTRO */}
+      <section className="services-intro">
+        <div className="services-container services-intro-grid">
+          <div>
+            <span className="services-small-label">MY APPROACH</span>
+            <h2>
+              Technology with a
+              <br />
+              <span>purpose.</span>
+            </h2>
+          </div>
+
+          <p>
+            Every project deserves a thoughtful approach. I focus on practical
+            solutions, clean design and reliable functionality that help
+            people and businesses move forward.
+          </p>
+        </div>
+      </section>
+
+      {/* CATEGORY NAVIGATION */}
+      <section className="services-category-nav" id="service-list">
+        <div className="services-container">
+          <div className="services-category-nav-heading">
+            <span className="services-small-label">EXPLORE MY EXPERTISE</span>
+            <h2>Find the right <span>solution.</span></h2>
+          </div>
+
+          <div className="services-category-nav-grid">
+            {categories.map((category) => {
+              const Icon = category.icon;
+
+              return (
+                <a
+                  href={`#${category.id}`}
+                  className="services-category-link"
+                  key={category.id}
+                >
+                  <span className="services-category-link-icon">
+                    <Icon size={22} />
+                  </span>
+                  <span className="services-category-link-text">
+                    <small>{category.number} / CATEGORY</small>
+                    <strong>{category.title}</strong>
+                  </span>
+                  <ArrowUpRight size={19} />
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES CATALOG */}
+      <section className="services-catalog">
+        <div className="services-container">
+
+          <div className="services-section-heading">
+            <div>
+              <span className="services-small-label">WHAT I OFFER</span>
+              <h2>My <span>Services.</span></h2>
+              <p>
+                Explore each category to discover the solutions available.
+              </p>
+            </div>
+
+            <div className="services-heading-decoration">
+              <Layers size={27} />
+              <span>CREATIVE Â· TECHNICAL Â· PRACTICAL</span>
+            </div>
+          </div>
+
+          {loading && (
+            <div className="services-message">
+              <RefreshCw className="services-spin" size={25} />
+              <h3>Loading services...</h3>
+              <p>Please wait while services are being loaded.</p>
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="services-message services-error">
+              <Settings size={27} />
+              <h3>Unable to load services</h3>
+              <p>{error}</p>
+              <button
+                className="services-btn services-btn-primary"
+                onClick={() => window.location.reload()}
+              >
+                Try Again <RefreshCw size={17} />
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="services-category-sections">
+              {categories.map((category) => {
+                const CategoryIcon = category.icon;
+                const categoryServices = groupedServices[category.id] || [];
+
+                return (
+                  <section
+                    className="services-category-section"
+                    id={category.id}
+                    key={category.id}
+                  >
+                    <div className="services-category-heading">
+                      <div className="services-category-heading-main">
+                        <div className="services-category-large-icon">
+                          <CategoryIcon size={30} />
+                        </div>
+
+                        <div>
+                          <span className="services-small-label">
+                            CATEGORY {category.number}
+                          </span>
+                          <h2>{category.title}</h2>
+                          <p>{category.description}</p>
+                        </div>
+                      </div>
+
+                      <span className="services-category-count">
+                        {String(categoryServices.length).padStart(2, "0")} SERVICES
+                      </span>
+                    </div>
+
+                    <div className="services-category-tags">
+                      {category.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+
+                    {categoryServices.length > 0 ? (
+                      <div className="services-grid">
+                        {categoryServices.map((service, index) => {
+                          const Icon = getServiceIcon(service.icon, index);
+
+                          return (
+                            <article
+                              className="services-card"
+                              key={service.id}
+                            >
+                              <div className="services-card-top">
+                                <div className="services-card-icon">
+                                  <Icon size={27} strokeWidth={1.7} />
+                                </div>
+                                <span className="services-card-number">
+                                  {String(index + 1).padStart(2, "0")}
+                                </span>
+                              </div>
+
+                              <div className="services-card-label">
+                                {category.title.toUpperCase()}
+                              </div>
+
+                              <h3>{service.title}</h3>
+
+                              <p>
+                                {service.description ||
+                                  "Professional and practical solutions designed to meet your needs."}
+                              </p>
+
+                              <div className="services-card-bottom">
+                                <span>Explore this service</span>
+                                <Link
+                                  to="/contact"
+                                  aria-label={`Contact about ${service.title}`}
+                                  className="services-card-link"
+                                >
+                                  <ArrowUpRight size={20} />
+                                </Link>
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="services-category-empty">
+                        <div><Layers size={24} /></div>
+                        <h3>More services coming soon</h3>
+                        <p>
+                          Services in this category will appear here when
+                          they are added and activated.
+                        </p>
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* BENEFITS */}
+      <section className="services-benefits">
+        <div className="services-container">
+          <div className="services-section-heading">
+            <div>
+              <span className="services-small-label">WHY MY APPROACH</span>
+              <h2>Built on <span>good work.</span></h2>
+              <p>Simple principles that guide every project.</p>
+            </div>
+          </div>
+
+          <div className="services-benefit-grid">
+            {benefits.map((item, index) => {
+              const Icon = item.icon;
+
+              return (
+                <article className="services-benefit-card" key={item.title}>
+                  <div className="services-benefit-number">0{index + 1}</div>
+                  <Icon size={29} />
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <section className="services-process">
+        <div className="services-container services-process-layout">
+          <div className="services-process-heading">
+            <span className="services-small-label">HOW I WORK</span>
+            <h2>
+              From idea
+              <br />
+              to <span>result.</span>
+            </h2>
+            <p>
+              A simple and organized process keeps every project moving in
+              the right direction.
+            </p>
+          </div>
+
+          <div className="services-process-list">
+            {process.map(([number, title, text]) => (
+              <div className="services-process-item" key={number}>
+                <span>{number}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+                <ArrowUpRight size={20} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="services-cta-section">
+        <div className="services-container">
+          <div className="services-cta">
+            <div className="services-cta-decoration">
+              <Globe size={100} />
+            </div>
+
+            <div className="services-cta-content">
+              <span className="services-small-label">
+                HAVE A PROJECT IN MIND?
+              </span>
+              <h2>
+                Let's build something
+                <br />
+                <span>meaningful.</span>
+              </h2>
+              <p>
+                Have an idea or need a technical solution? Let's discuss it.
+              </p>
+              <Link to="/contact" className="services-btn services-btn-light">
+                Contact Me <ArrowUpRight size={19} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+}

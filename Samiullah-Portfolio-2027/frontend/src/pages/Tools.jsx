@@ -1,0 +1,562 @@
+﻿
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  Code2, Palette, Braces, Network, Copy, Download, Upload,
+  Play, RotateCcw, Sun, Moon, Search, Check, AlertCircle,
+  ChevronRight, Terminal, Eye, FileCode2, WandSparkles,
+  ShieldCheck, Globe, Menu, X, Monitor, Smartphone
+} from 'lucide-react';
+import * as prettier from 'prettier/standalone';
+import htmlPlugin from 'prettier/plugins/html';
+import postcssPlugin from 'prettier/plugins/postcss';
+import babelPlugin from 'prettier/plugins/babel';
+import './Tools.css';
+
+const groups = [
+  {
+    id: 'html',
+    name: 'HTML Tools',
+    icon: Code2,
+    description: 'Build and validate web page structure.',
+    tools: [
+      ['formatter', 'HTML Formatter', 'Format and organize HTML code.'],
+      ['validator', 'HTML Validator', 'Check basic HTML structure and errors.'],
+      ['editor', 'HTML Editor', 'Write HTML and preview it live.'],
+      ['preview', 'Live Preview', 'See your HTML page instantly.'],
+    ],
+  },
+  {
+    id: 'css',
+    name: 'CSS Tools',
+    icon: Palette,
+    description: 'Style websites with useful CSS utilities.',
+    tools: [
+      ['formatter', 'CSS Formatter', 'Format CSS with readable indentation.'],
+      ['minifier', 'CSS Minifier', 'Reduce CSS whitespace and file size.'],
+      ['color', 'Color Picker', 'Choose a color and copy its value.'],
+      ['gradient', 'Gradient Generator', 'Create and copy CSS gradients.'],
+      ['preview', 'Live Preview', 'Preview HTML and CSS together.'],
+    ],
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript Tools',
+    icon: Braces,
+    description: 'Write, format and test JavaScript code.',
+    tools: [
+      ['formatter', 'JS Formatter', 'Format JavaScript code.'],
+      ['minifier', 'JS Minifier', 'Minify JavaScript whitespace.'],
+      ['editor', 'Code Editor', 'Write and run JavaScript safely.'],
+      ['console', 'Live Console', 'View console output and errors.'],
+    ],
+  },
+  {
+    id: 'network',
+    name: 'Network Tools',
+    icon: Network,
+    description: 'Calculate and inspect IPv4 network details.',
+    tools: [
+      ['validator', 'IP Validator', 'Validate IPv4 addresses and CIDR.'],
+      ['subnet', 'Subnet Calculator', 'Calculate subnet information.'],
+      ['info', 'Network Information', 'View network address details.'],
+      ['converter', 'IP Converter', 'Convert IPv4 to binary and decimal.'],
+    ],
+  },
+];
+
+const starterCode = {
+  html: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Web Page</title>\n</head>\n<body>\n  <h1>Hello, World!</h1>\n  <p>Welcome to my page.</p>\n</body>\n</html>',
+  css: 'body {\n  font-family: Arial, sans-serif;\n  background: #f4f6fb;\n  color: #17213b;\n  padding: 30px;\n}\n\nh1 {\n  color: #4169f5;\n}',
+  javascript: "const message = 'Hello, Samiullah!';\nconsole.log(message);\n\nfunction add(a, b) {\n  return a + b;\n}\n\nconsole.log('2 + 3 =', add(2, 3));",
+};
+
+function getSubnet(value) {
+  const [ip, prefixText] = value.trim().split('/');
+  const parts = ip.split('.');
+  if (parts.length !== 4 || parts.some(part => !/^\d+$/.test(part) || Number(part) > 255)) return null;
+
+  const prefix = prefixText === undefined || prefixText === '' ? 24 : Number(prefixText);
+  if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) return null;
+
+  const number = parts.reduce((total, part) => ((total * 256) + Number(part)) >>> 0, 0);
+  const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+  const network = (number & mask) >>> 0;
+  const broadcast = (network | (~mask >>> 0)) >>> 0;
+  const toIp = n => [24, 16, 8, 0].map(shift => (n >>> shift) & 255).join('.');
+  const total = Math.pow(2, 32 - prefix);
+
+  return {
+    ip,
+    prefix,
+    mask: toIp(mask),
+    network: toIp(network),
+    broadcast: toIp(broadcast),
+    first: prefix >= 31 ? toIp(network) : toIp(network + 1),
+    last: prefix >= 31 ? toIp(broadcast) : toIp(broadcast - 1),
+    total,
+    usable: prefix === 32 ? 1 : prefix === 31 ? 2 : Math.max(0, total - 2),
+  };
+}
+
+function downloadText(filename, content) {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function makePreview(html, css, js) {
+  const safeJs = js.replace(/<\/script/gi, '<\\/script');
+  return `<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>${css}</style>
+</head>
+<body>
+${html}
+<script>
+(function () {
+  const send = (type, args) => parent.postMessage({
+    __onlineToolsConsole: true,
+    type,
+    message: args.map(value => {
+      try { return typeof value === 'object' ? JSON.stringify(value) : String(value); }
+      catch { return String(value); }
+    }).join(' ')
+  }, '*');
+  ['log', 'warn', 'error'].forEach(type => {
+    const original = console[type];
+    console[type] = (...args) => {
+      send(type, args);
+      original.apply(console, args);
+    };
+  });
+  window.addEventListener('error', event => send('error', [event.message]));
+})();
+${safeJs}
+<\/script>
+</body>
+</html>`;
+}
+
+export default function Tools() {
+  const location = useLocation();
+  const currentGroup = location.pathname.split('/')[2] || '';
+  const defaultEnabled = {
+    html: true,
+    css: true,
+    javascript: true,
+    network: true,
+  };
+
+  const [enabledCategories, setEnabledCategories] = useState(() => {
+    try {
+      const saved = localStorage.getItem("online-tools-enabled-categories");
+      return saved
+        ? { ...defaultEnabled, ...JSON.parse(saved) }
+        : defaultEnabled;
+    } catch {
+      return defaultEnabled;
+    }
+  });
+
+  useEffect(() => {
+    const refreshCategories = () => {
+      try {
+        const saved = localStorage.getItem("online-tools-enabled-categories");
+        setEnabledCategories(
+          saved
+            ? { ...defaultEnabled, ...JSON.parse(saved) }
+            : defaultEnabled
+        );
+      } catch {
+        setEnabledCategories(defaultEnabled);
+      }
+    };
+
+    window.addEventListener("online-tools-config-change", refreshCategories);
+    window.addEventListener("storage", refreshCategories);
+
+    return () => {
+      window.removeEventListener("online-tools-config-change", refreshCategories);
+      window.removeEventListener("storage", refreshCategories);
+    };
+  }, []);
+
+  const availableGroups = groups.filter(
+    item => enabledCategories[item.id] !== false
+  );
+
+  const group = availableGroups.find(item => item.id === currentGroup);
+  const [activeTool, setActiveTool] = useState('');
+  const [code, setCode] = useState('');
+  const [htmlCode, setHtmlCode] = useState(starterCode.html);
+  const [cssCode, setCssCode] = useState(starterCode.css);
+  const [jsCode, setJsCode] = useState(starterCode.javascript);
+  const [theme, setTheme] = useState(() => localStorage.getItem('online-tools-theme') || 'dark');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [ip, setIp] = useState('192.168.1.10/24');
+  const [subnet, setSubnet] = useState(null);
+  const [color, setColor] = useState('#4169f5');
+  const [angle, setAngle] = useState(135);
+  const [consoleLines, setConsoleLines] = useState([]);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const fileInput = useRef(null);
+  const editorRef = useRef(null);
+
+  const tool = group?.tools.find(item => item[0] === activeTool) || group?.tools[0];
+  const preview = useMemo(
+    () => makePreview(htmlCode, cssCode, jsCode),
+    [htmlCode, cssCode, jsCode]
+  );
+  const gradient = `linear-gradient(${angle}deg, ${color}, #a855f7)`;
+
+  useEffect(() => {
+    setActiveTool('');
+    setMessage('');
+    setError('');
+    setSubnet(null);
+  }, [currentGroup]);
+
+  useEffect(() => {
+    localStorage.setItem('online-tools-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const receive = event => {
+      if (event.data?.__onlineToolsConsole) {
+        setConsoleLines(lines => [...lines.slice(-49), event.data]);
+      }
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, []);
+
+  useEffect(() => {
+    if (!group) return;
+    const first = group.tools[0][0];
+    setActiveTool(first);
+    setCode(starterCode[group.id] || '');
+  }, [currentGroup]);
+
+  const notify = text => {
+    setMessage(text);
+    setError('');
+    window.setTimeout(() => setMessage(''), 2500);
+  };
+
+  const runFormatter = async minify => {
+    if (!code.trim()) {
+      setError('Please enter some code first.');
+      return;
+    }
+    try {
+      const parser = group.id === 'html' ? 'html' : group.id === 'css' ? 'css' : 'babel';
+      const plugins = group.id === 'html'
+        ? [htmlPlugin]
+        : group.id === 'css'
+          ? [postcssPlugin]
+          : [babelPlugin];
+
+      let result = await prettier.format(code, {
+        parser,
+        plugins,
+        semi: true,
+        singleQuote: true,
+        tabWidth: 2,
+      });
+
+      if (minify) {
+        result = result
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/\s+/g, ' ')
+          .replace(/\s*([{}:;,])\s*/g, '$1')
+          .trim();
+      }
+      setCode(result);
+      notify(minify ? 'Code minified successfully.' : 'Code formatted successfully.');
+    } catch (err) {
+      setError(err.message || 'Unable to process this code.');
+    }
+  };
+
+  const validateHtml = () => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(code, 'text/html');
+    const parserError = doc.querySelector('parsererror');
+    if (parserError) setError('HTML parser found an error. Please review your markup.');
+    else notify('HTML parsed successfully. Review the document structure and accessibility too.');
+  };
+
+  const validateIp = () => {
+    const result = getSubnet(ip);
+    setSubnet(result);
+    if (!result) setError('Invalid IPv4 address or CIDR prefix. Example: 192.168.1.10/24');
+    else notify('Valid IPv4 address.');
+  };
+
+  const copyText = async text => {
+    try {
+      await navigator.clipboard.writeText(text);
+      notify('Copied to clipboard.');
+    } catch {
+      setError('Clipboard access is unavailable. Select and copy the text manually.');
+    }
+  };
+
+  const uploadFile = async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    setCode(text);
+    notify(`${file.name} loaded successfully.`);
+    event.target.value = '';
+  };
+
+  const changeTool = id => {
+    setActiveTool(id);
+    setMessage('');
+    setError('');
+    setSubnet(null);
+    if (group.id === 'html') setCode(starterCode.html);
+    if (group.id === 'css') setCode(starterCode.css);
+    if (group.id === 'javascript') setCode(starterCode.javascript);
+  };
+
+  const runNetwork = () => {
+    const result = getSubnet(ip);
+    setSubnet(result);
+    if (!result) setError('Invalid IPv4 address or CIDR prefix.');
+    else notify('Network calculation completed.');
+  };
+
+  const editorActions = (
+    <div className="ot-toolbar">
+      <button onClick={() => runFormatter(false)}><WandSparkles size={16} /> Format</button>
+      {activeTool === 'minifier' && <button onClick={() => runFormatter(true)}>Minify</button>}
+      {activeTool === 'validator' && <button onClick={validateHtml}><Check size={16} /> Validate</button>}
+      <button onClick={() => copyText(code)}><Copy size={16} /> Copy</button>
+      <button onClick={() => downloadText(`${group.id}-code.${group.id === 'javascript' ? 'js' : group.id}`, code)}><Download size={16} /> Download</button>
+      <button onClick={() => fileInput.current?.click()}><Upload size={16} /> Upload</button>
+      <button onClick={() => { setCode(starterCode[group.id] || ''); setError(''); setMessage(''); }}><RotateCcw size={16} /> Reset</button>
+      <input ref={fileInput} type="file" accept=".html,.htm,.css,.js,.jsx,.txt" hidden onChange={uploadFile} />
+    </div>
+  );
+
+  if (!group) {
+    return (
+      <main className={`tools-page ${theme === 'light' ? 'ot-light' : 'ot-dark'}`}>
+        <section className="ot-landing">
+          <div className="ot-topline">
+            <span className="ot-brand"><Code2 size={21} /> Samiullah Tools</span>
+            <button className="ot-theme-button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+          </div>
+          <div className="ot-hero">
+            <span className="ot-eyebrow"><span className="ot-live-dot" /> DEVELOPER TOOLKIT</span>
+            <h1>Build smarter.<br /><span>Code faster.</span></h1>
+            <p>A collection of practical tools for web developers and network learners. Fast, simple and designed to work locally in your browser.</p>
+            <div className="ot-hero-actions">
+              <a href="#tool-categories" className="ot-main-button">Explore tools <ChevronRight size={18} /></a>
+              <span><ShieldCheck size={16} /> Your code stays in your browser</span>
+            </div>
+            <div className="ot-hero-orbit"><Code2 /><Braces /><Terminal /></div>
+          </div>
+          <div className="ot-section-heading" id="tool-categories">
+            <div><span className="ot-eyebrow">TOOL COLLECTION</span><h2>Everything you need to build</h2></div>
+            <span className="ot-count">{String(availableGroups.length).padStart(2, '0')} TOOL CATEGORIES</span>
+          </div>
+          <div className="ot-category-grid">
+            {availableGroups.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Link to={`/tools/${item.id}`} className="ot-category-card" key={item.id}>
+                  <div className="ot-card-top"><span className="ot-card-icon"><Icon size={23} /></span><span className="ot-card-number">0{index + 1}</span></div>
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <div className="ot-card-footer"><span>{item.tools.length} tools available</span><ChevronRight size={18} /></div>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="ot-landing-footer"><span>Designed for developers</span><span>Local-first Â· Responsive Â· Simple</span></div>
+        </section>
+      </main>
+    );
+  }
+
+  const Icon = group.icon;
+  const isNetwork = group.id === 'network';
+  const showPreview = group.id === 'html' || group.id === 'css' || group.id === 'javascript';
+
+  return (
+    <main className={`tools-page ${theme === 'light' ? 'ot-light' : 'ot-dark'}`}>
+      <div className="ot-app">
+        <header className="ot-app-header">
+          <Link to="/tools" className="ot-brand"><Code2 size={21} /> Samiullah <span>Tools</span></Link>
+          <div className="ot-header-right">
+            <span className="ot-local-badge"><span className="ot-live-dot" /> LOCAL WORKSPACE</span>
+            <button className="ot-theme-button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </button>
+            <button className="ot-mobile-toggle" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Toggle tools menu">
+              {mobileMenu ? <X /> : <Menu />}
+            </button>
+          </div>
+        </header>
+
+        <div className="ot-app-body">
+          <aside className={`ot-sidebar ${mobileMenu ? 'ot-sidebar-open' : ''}`}>
+            <div className="ot-sidebar-label">WORKSPACE</div>
+            <Link to="/tools" className="ot-sidebar-home"><Monitor size={17} /> All tools</Link>
+            <div className="ot-sidebar-label ot-sidebar-tools-label">CATEGORIES</div>
+            {availableGroups.map(item => {
+              const GroupIcon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  to={`/tools/${item.id}`}
+                  onClick={() => setMobileMenu(false)}
+                  className={`ot-nav-group ${item.id === group.id ? 'active' : ''}`}
+                >
+                  <GroupIcon size={18} /> <span>{item.name}</span><ChevronRight size={15} />
+                </Link>
+              );
+            })}
+            <div className="ot-sidebar-divider" />
+            <div className="ot-sidebar-label">CURRENT TOOLS</div>
+            {group.tools.map(item => (
+              <button
+                key={item[0]}
+                onClick={() => { changeTool(item[0]); setMobileMenu(false); }}
+                className={`ot-subtool ${tool?.[0] === item[0] ? 'active' : ''}`}
+              >
+                <span className="ot-subtool-dot" /> {item[1]}
+              </button>
+            ))}
+            <div className="ot-sidebar-bottom"><ShieldCheck size={17} /><span>Local-first tools<br /><small>Your code stays on this device</small></span></div>
+          </aside>
+
+          <section className="ot-main-panel">
+            <div className="ot-breadcrumb"><Link to="/tools">Tools</Link><ChevronRight size={14} /><span>{group.name}</span></div>
+            <div className="ot-page-heading">
+              <div className="ot-page-icon"><Icon size={24} /></div>
+              <div><span className="ot-eyebrow">DEVELOPER WORKSPACE</span><h1>{group.name}</h1><p>{tool?.[2]}</p></div>
+            </div>
+
+            <div className="ot-tool-tabs">
+              {group.tools.map(item => (
+                <button key={item[0]} className={tool?.[0] === item[0] ? 'active' : ''} onClick={() => changeTool(item[0])}>{item[1]}</button>
+              ))}
+            </div>
+
+            {message && <div className="ot-message"><Check size={16} /> {message}</div>}
+            {error && <div className="ot-error"><AlertCircle size={16} /> {error}</div>}
+
+            {isNetwork ? (
+              <div className="ot-network-layout">
+                <section className="ot-panel ot-network-panel">
+                  <div className="ot-panel-heading"><div><span className="ot-eyebrow">IPV4 UTILITY</span><h2>{tool?.[1]}</h2></div><Network size={21} /></div>
+                  <p className="ot-muted">Enter an IPv4 address with an optional CIDR prefix.</p>
+                  <label className="ot-field-label" htmlFor="ot-ip">IPv4 address / CIDR</label>
+                  <div className="ot-input-row"><input id="ot-ip" value={ip} onChange={e => { setIp(e.target.value); setSubnet(null); setError(''); }} onKeyDown={e => e.key === 'Enter' && runNetwork()} placeholder="192.168.1.10/24" /><button onClick={runNetwork}><Play size={16} /> Calculate</button></div>
+                  <div className="ot-example">Example: 192.168.1.10/24</div>
+                  {subnet && (
+                    <div className="ot-results-grid">
+                      {[
+                        ['IP Address', subnet.ip],
+                        ['CIDR Prefix', `/${subnet.prefix}`],
+                        ['Subnet Mask', subnet.mask],
+                        ['Network Address', subnet.network],
+                        ['Broadcast Address', subnet.broadcast],
+                        ['First Host', subnet.first],
+                        ['Last Host', subnet.last],
+                        ['Total Addresses', subnet.total.toLocaleString()],
+                        ['Usable Addresses', subnet.usable.toLocaleString()],
+                      ].map(([label, value]) => <div className="ot-result" key={label}><span>{label}</span><strong>{value}</strong></div>)}
+                    </div>
+                  )}
+                </section>
+                <section className="ot-panel ot-network-info">
+                  <span className="ot-eyebrow">NETWORK NOTES</span>
+                  <h3>IPv4 quick guide</h3>
+                  <p className="ot-muted">An IPv4 address contains 32 bits, usually written as four decimal octets.</p>
+                  <div className="ot-info-line"><span>IPv4 length</span><strong>32 bits</strong></div>
+                  <div className="ot-info-line"><span>Address range</span><strong>0 â€“ 255 per octet</strong></div>
+                  <div className="ot-info-line"><span>CIDR range</span><strong>/0 â€“ /32</strong></div>
+                  <div className="ot-info-tip"><ShieldCheck size={18} /><span>Calculations run locally in your browser. No address is sent to a server.</span></div>
+                </section>
+              </div>
+            ) : (
+              <div className="ot-workspace-grid">
+                <section className="ot-panel ot-editor-panel">
+                  <div className="ot-panel-heading">
+                    <div><span className="ot-eyebrow">SOURCE EDITOR</span><h2><FileCode2 size={18} /> {group.id === 'javascript' ? 'script.js' : group.id === 'css' ? 'styles.css' : 'index.html'}</h2></div>
+                    <span className="ot-language-tag">{group.id.toUpperCase()}</span>
+                  </div>
+                  {editorActions}
+                  <textarea
+                    ref={editorRef}
+                    className="ot-code-editor"
+                    spellCheck="false"
+                    value={code}
+                    onChange={e => {
+                      setCode(e.target.value);
+                      if (group.id === 'html') setHtmlCode(e.target.value);
+                      if (group.id === 'css') setCssCode(e.target.value);
+                      if (group.id === 'javascript') setJsCode(e.target.value);
+                    }}
+                    onBlur={() => {
+                      if (group.id === 'html') setHtmlCode(code);
+                      if (group.id === 'css') setCssCode(code);
+                      if (group.id === 'javascript') setJsCode(code);
+                    }}
+                    placeholder="Start writing your code..."
+                  />
+                  <div className="ot-editor-status"><span><span className="ot-live-dot" /> Ready</span><span>{code.split('\n').length} lines Â· {code.length} characters</span></div>
+                </section>
+
+                {showPreview && (
+                  <section className="ot-panel ot-preview-panel">
+                    <div className="ot-panel-heading"><div><span className="ot-eyebrow">OUTPUT WINDOW</span><h2><Eye size={18} /> Live Preview</h2></div><span className="ot-preview-live">LIVE</span></div>
+                    <div className="ot-preview-frame-wrap">
+                      <iframe
+                        title="Code preview"
+                        className="ot-preview-frame"
+                        sandbox="allow-scripts"
+                        srcDoc={makePreview(
+                          group.id === 'html' ? code : htmlCode,
+                          group.id === 'css' ? code : cssCode,
+                          group.id === 'javascript' ? code : jsCode
+                        )}
+                      />
+                    </div>
+                    {group.id === 'javascript' && (
+                      <div className="ot-console">
+                        <div className="ot-console-heading"><span><Terminal size={15} /> Console</span><button onClick={() => setConsoleLines([])}>Clear</button></div>
+                        {consoleLines.length === 0 ? <p className="ot-muted">Run your JavaScript to see console messages here.</p> : consoleLines.map((line, index) => <div className={`ot-console-line ${line.type}`} key={`${index}-${line.message}`}>{line.message}</div>)}
+                      </div>
+                    )}
+                  </section>
+                )}
+              </div>
+            )}
+
+            <div className="ot-bottom-note"><ShieldCheck size={17} /><span>Local processing: your code is processed in this browser. No account or upload required.</span><span className="ot-offline-label">OFFLINE READY</span></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}
+

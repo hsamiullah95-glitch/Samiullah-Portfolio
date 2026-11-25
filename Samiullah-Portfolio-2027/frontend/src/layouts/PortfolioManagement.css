@@ -1,0 +1,511 @@
+
+.sh-portfolio-admin {
+  padding: 5px 0 30px;
+  color: var(--text, #222);
+}
+
+.sh-portfolio-heading,
+.sh-portfolio-heading-actions,
+.sh-portfolio-list-heading,
+.sh-portfolio-form-heading,
+.sh-portfolio-form-buttons,
+.sh-portfolio-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.sh-portfolio-heading {
+  margin-bottom: 25px;
+}
+
+.sh-portfolio-heading h1 {
+  margin: 15px 0 7px;
+  font-size: 28px;
+}
+
+.sh-portfolio-heading p,
+.sh-portfolio-list-heading p,
+.sh-portfolio-form-heading p {
+  color: #888;
+  margin: 0;
+}
+
+.sh-portfolio-add,
+.sh-portfolio-save,
+.sh-portfolio-empty button {
+  border: 0;
+  background: #e96d3d;
+  color: white;
+  padding: 13px 19px;
+  border-radius: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sh-portfolio-refresh,
+.sh-portfolio-close {
+  width: 43px;
+  height: 43px;
+  border: 1px solid #e5e5e5;
+  background: white;
+  border-radius: 9px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: #555;
+}
+
+.sh-portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.sh-portfolio-summary-card {
+  position: relative;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 13px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sh-portfolio-summary-card span {
+  color: #777;
+  font-size: 14px;
+}
+
+.sh-portfolio-summary-card strong {
+  font-size: 30px;
+}
+
+.sh-portfolio-summary-card > svg {
+  position: absolute;
+  right: 20px;
+  top: 24px;
+  color: #e96d3d;
+}
+
+.sh-portfolio-form,
+.sh-portfolio-list {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.sh-portfolio-form-heading {
+  margin-bottom: 25px;
+}
+
+.sh-portfolio-form-heading h2,
+.sh-portfolio-list-heading h2 {
+  margin: 0 0 7px;
+  font-size: 20px;
+}
+
+.sh-portfolio-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.sh-portfolio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.sh-portfolio-full {
+  grid-column: 1 / -1;
+}
+
+.sh-portfolio-field label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sh-portfolio-field input,
+.sh-portfolio-field textarea,
+.sh-portfolio-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+  background: white;
+  color: #222;
+}
+
+.sh-portfolio-field input:focus,
+.sh-portfolio-field textarea:focus,
+.sh-portfolio-field select:focus {
+  border-color: #e96d3d;
+}
+
+.sh-portfolio-upload {
+  min-height: 75px;
+  border: 1px dashed #bbb;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #777;
+  padding: 15px;
+}
+
+.sh-portfolio-upload input {
+  display: none;
+}
+
+.sh-portfolio-preview {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.sh-portfolio-preview img {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 9px;
+}
+
+.sh-portfolio-preview button {
+  border: 0;
+  background: #fff0ed;
+  color: #d34c35;
+  border-radius: 7px;
+  padding: 9px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sh-portfolio-form-buttons {
+  justify-content: flex-start;
+  margin-top: 25px;
+}
+
+.sh-portfolio-save,
+.sh-portfolio-cancel {
+  min-width: 145px;
+  border: 0;
+  border-radius: 8px;
+  padding: 13px 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.sh-portfolio-save {
+  background: #e96d3d;
+  color: white;
+}
+
+.sh-portfolio-save:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.sh-portfolio-cancel {
+  background: #eee;
+  color: #444;
+}
+
+.sh-portfolio-list-heading {
+  margin-bottom: 22px;
+}
+
+.sh-portfolio-list-heading > span {
+  background: #fff0e9;
+  color: #d85e36;
+  border-radius: 20px;
+  padding: 8px 13px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sh-portfolio-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.sh-portfolio-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.sh-portfolio-table th,
+.sh-portfolio-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 13px;
+}
+
+.sh-portfolio-table th {
+  background: #fafafa;
+  color: #666;
+  font-weight: 700;
+}
+
+.sh-portfolio-table-image {
+  width: 58px;
+  height: 48px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #f3f3f3;
+  display: grid;
+  place-items: center;
+  color: #aaa;
+}
+
+.sh-portfolio-table-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sh-portfolio-description {
+  max-width: 220px;
+  color: #777;
+}
+
+.sh-portfolio-link {
+  color: #e96d3d;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sh-portfolio-no-link {
+  color: #aaa;
+}
+
+.sh-portfolio-active,
+.sh-portfolio-inactive {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sh-portfolio-active {
+  color: #16834d;
+  background: #e6f7ed;
+}
+
+.sh-portfolio-inactive {
+  color: #b36b1d;
+  background: #fff2df;
+}
+
+.sh-portfolio-actions {
+  justify-content: flex-start;
+}
+
+.sh-portfolio-edit,
+.sh-portfolio-delete {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.sh-portfolio-edit {
+  color: #286acb;
+  background: #eaf2ff;
+}
+
+.sh-portfolio-delete {
+  color: #d74747;
+  background: #fff0f0;
+}
+
+.sh-portfolio-empty {
+  min-height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #999;
+  gap: 10px;
+}
+
+.sh-portfolio-empty h3 {
+  color: #333;
+  margin: 5px 0 0;
+}
+
+.sh-portfolio-empty p {
+  margin: 0 0 10px;
+}
+
+.sh-portfolio-error,
+.sh-portfolio-success {
+  padding: 13px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.sh-portfolio-error {
+  background: #fff0f0;
+  color: #c73535;
+}
+
+.sh-portfolio-success {
+  background: #eaf8ef;
+  color: #16834d;
+}
+
+@media (max-width: 800px) {
+  .sh-portfolio-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-portfolio-input-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-portfolio-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sh-portfolio-heading-actions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .sh-portfolio-form,
+  .sh-portfolio-list {
+    padding: 16px;
+  }
+
+  .sh-portfolio-heading h1 {
+    font-size: 23px;
+  }
+
+  .sh-portfolio-add {
+    flex: 1;
+  }
+}
+
+/* =========================================
+   PORTFOLIO ADMIN - HIGH CONTRAST COLORS
+   ========================================= */
+
+.sh-portfolio-admin {
+  color: #172033 !important;
+}
+
+.sh-portfolio-admin h1,
+.sh-portfolio-admin h2,
+.sh-portfolio-admin h3,
+.sh-portfolio-admin strong {
+  color: #172033 !important;
+}
+
+.sh-portfolio-heading p,
+.sh-portfolio-list-heading p,
+.sh-portfolio-form-heading p,
+.sh-portfolio-summary-card span {
+  color: #475569 !important;
+}
+
+.sh-portfolio-field label {
+  color: #1e293b !important;
+  font-weight: 700;
+}
+
+.sh-portfolio-field input,
+.sh-portfolio-field textarea,
+.sh-portfolio-field select {
+  color: #172033 !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.sh-portfolio-field input::placeholder,
+.sh-portfolio-field textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+.sh-portfolio-upload {
+  color: #334155 !important;
+  border-color: #94a3b8 !important;
+  background: #f8fafc;
+}
+
+.sh-portfolio-table th {
+  color: #1e293b !important;
+  background: #eaf0f6 !important;
+}
+
+.sh-portfolio-table td {
+  color: #334155 !important;
+}
+
+.sh-portfolio-description {
+  color: #475569 !important;
+}
+
+.sh-portfolio-no-link {
+  color: #64748b !important;
+}
+
+.sh-portfolio-empty {
+  color: #475569 !important;
+}
+
+.sh-portfolio-empty h3 {
+  color: #172033 !important;
+}
+
+.sh-portfolio-empty p {
+  color: #475569 !important;
+}
+
+.sh-portfolio-refresh,
+.sh-portfolio-close {
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.sh-portfolio-cancel {
+  color: #1e293b !important;
+}
+
+.sh-portfolio-summary-card,
+.sh-portfolio-form,
+.sh-portfolio-list {
+  color: #172033 !important;
+  border-color: #dbe3ec !important;
+}
+

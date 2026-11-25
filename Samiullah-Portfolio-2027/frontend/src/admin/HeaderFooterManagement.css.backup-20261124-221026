@@ -1,0 +1,142 @@
+﻿.hf-management {
+  width: 100%;
+  padding: 28px;
+  color: var(--heading, #222);
+}
+
+.hf-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.hf-eyebrow {
+  color: #2878e5;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.hf-heading h2 {
+  margin: 8px 0;
+  font-size: 25px;
+}
+
+.hf-heading p {
+  color: #858b98;
+  font-size: 13px;
+}
+
+.hf-refresh,
+.hf-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.hf-refresh {
+  background: #edf3fc;
+  color: #246bd0;
+}
+
+.hf-section-title {
+  font-size: 16px;
+  font-weight: 800;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e8eaf0;
+}
+
+.hf-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.hf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hf-field input,
+.hf-field textarea {
+  width: 100%;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+  padding: 13px 14px;
+  background: #fff;
+  color: #252b36;
+  font: inherit;
+  font-weight: 400;
+  outline: none;
+}
+
+.hf-field input:focus,
+.hf-field textarea:focus {
+  border-color: #2878e5;
+  box-shadow: 0 0 0 3px #2878e51a;
+}
+
+.hf-field textarea {
+  resize: vertical;
+}
+
+.hf-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.hf-actions button {
+  background: #2878e5;
+  color: white;
+}
+
+.hf-actions button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.hf-success,
+.hf-error {
+  padding: 13px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+
+.hf-success {
+  background: #e8f8ef;
+  color: #167342;
+}
+
+.hf-error {
+  background: #fff0f0;
+  color: #bb3030;
+}
+
+@media(max-width: 700px) {
+  .hf-management {
+    padding: 16px;
+  }
+
+  .hf-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hf-fields {
+    grid-template-columns: 1fr;
+  }
+}

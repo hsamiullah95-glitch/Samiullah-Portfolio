@@ -1,0 +1,367 @@
+import { useEffect, useState } from "react";
+import {
+  FileText,
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  X,
+  Save,
+  Eye,
+  RefreshCw
+} from "lucide-react";
+import "./BlogManagement.css";
+
+const API = "http://localhost:8001/api/blog.php";
+
+const emptyForm = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  content: "",
+  image: "",
+  category: "General",
+  status: "draft"
+};
+
+export default function BlogManagement() {
+  const [posts, setPosts] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [message, setMessage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+
+  async function loadPosts() {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(API, {
+        credentials: "include"
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not load blog posts.");
+      }
+
+      setPosts(result.data || []);
+    } catch (error) {
+      setMessage(error.message || "Server connection error.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  function updateField(name, value) {
+    setForm(current => ({ ...current, [name]: value }));
+  }
+
+  function createPost() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setImageFile(null);
+    setShowForm(true);
+    setMessage("");
+  }
+
+  function editPost(post) {
+    setEditingId(post.id);
+    setForm({
+      title: post.title || "",
+      slug: post.slug || "",
+      excerpt: post.excerpt || "",
+      content: post.content || "",
+      image: post.image || "",
+      category: post.category || "General",
+      status: post.status || "draft"
+    });
+    setImageFile(null);
+    setShowForm(true);
+    setMessage("");
+  }
+
+  async function savePost(event) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const formData = new FormData();
+
+      Object.entries({
+        ...form,
+        id: editingId || "",
+        _method: editingId ? "PUT" : "POST"
+      }).forEach(([key, value]) => {
+        formData.append(key, value ?? "");
+      });
+
+      if (imageFile) {
+        formData.append("image_file", imageFile);
+      }
+
+      const response = await fetch(API, {
+        method: "POST",
+        credentials: "include",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not save the article.");
+      }
+
+      setMessage(result.message);
+      setShowForm(false);
+      setForm(emptyForm);
+      setEditingId(null);
+      await loadPosts();
+    } catch (error) {
+      setMessage(error.message || "Server connection error.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deletePost(post) {
+    if (!window.confirm(`Delete "${post.title}"?`)) return;
+
+    try {
+      const response = await fetch(API, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: post.id })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not delete article.");
+      }
+
+      setMessage(result.message);
+      await loadPosts();
+    } catch (error) {
+      setMessage(error.message || "Server connection error.");
+    }
+  }
+
+  const visiblePosts = posts.filter(post => {
+    const matchesSearch =
+      post.title.toLowerCase().includes(search.toLowerCase()) ||
+      (post.category || "").toLowerCase().includes(search.toLowerCase());
+
+    const matchesFilter =
+      filter === "all" || post.status === filter;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="sh-blog-management">
+      <div className="sh-blog-heading">
+        <div>
+          <span className="sh-blog-eyebrow">CONTENT MANAGEMENT</span>
+          <h2>Blog Posts</h2>
+          <p>Create, edit and publish your articles.</p>
+        </div>
+
+        <div className="sh-blog-heading-actions">
+          <button type="button" onClick={loadPosts} className="sh-blog-refresh">
+            <RefreshCw size={17} /> Refresh
+          </button>
+          <button type="button" onClick={createPost} className="sh-blog-add">
+            <Plus size={18} /> New Article
+          </button>
+        </div>
+      </div>
+
+      {message && (
+        <div className="sh-blog-message" role="status">
+          {message}
+        </div>
+      )}
+
+      {showForm && (
+        <section className="sh-blog-form-card">
+          <div className="sh-blog-form-heading">
+            <div>
+              <span className="sh-blog-eyebrow">
+                {editingId ? "EDIT ARTICLE" : "NEW ARTICLE"}
+              </span>
+              <h3>{editingId ? "Update Blog Post" : "Create Blog Post"}</h3>
+            </div>
+
+            <button type="button" onClick={() => setShowForm(false)} aria-label="Close form">
+              <X size={20} />
+            </button>
+          </div>
+
+          <form onSubmit={savePost}>
+            <label>Article Title *</label>
+            <input
+              value={form.title}
+              onChange={e => updateField("title", e.target.value)}
+              placeholder="Enter article title"
+              maxLength={255}
+              required
+            />
+
+            <label>URL Slug <span>(optional)</span></label>
+            <input
+              value={form.slug}
+              onChange={e => updateField("slug", e.target.value)}
+              placeholder="my-first-article"
+              maxLength={255}
+            />
+
+            <label>Short Description</label>
+            <textarea
+              value={form.excerpt}
+              onChange={e => updateField("excerpt", e.target.value)}
+              placeholder="Write a short introduction..."
+              rows={3}
+            />
+
+            <label>Article Content *</label>
+            <textarea
+              value={form.content}
+              onChange={e => updateField("content", e.target.value)}
+              placeholder="Write your article..."
+              rows={10}
+              required
+            />
+
+            <label>Upload Article Image (optional)</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={e => setImageFile(e.target.files?.[0] || null)}
+            />
+            {imageFile && <small>Selected: {imageFile.name}</small>}
+
+            <label>Image URL (optional)</label>
+            <input
+              value={form.image}
+              onChange={e => updateField("image", e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              maxLength={500}
+            />
+
+            <label>Category</label>
+            <input
+              value={form.category}
+              onChange={e => updateField("category", e.target.value)}
+              placeholder="General"
+              maxLength={100}
+            />
+
+            <label>Publication Status</label>
+            <select
+              value={form.status}
+              onChange={e => updateField("status", e.target.value)}
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+
+            <div className="sh-blog-form-actions">
+              <button type="button" className="sh-blog-cancel" onClick={() => setShowForm(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="sh-blog-save" disabled={saving}>
+                <Save size={17} />
+                {saving ? "Saving..." : editingId ? "Update Article" : "Save Article"}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      <section className="sh-blog-list-card">
+        <div className="sh-blog-list-heading">
+          <div>
+            <span className="sh-blog-eyebrow">YOUR CONTENT</span>
+            <h3>All Articles <span>{visiblePosts.length}</span></h3>
+          </div>
+        </div>
+
+        <div className="sh-blog-toolbar">
+          <div className="sh-blog-search">
+            <Search size={17} />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search articles..."
+            />
+          </div>
+
+          <select value={filter} onChange={e => setFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+
+        {loading ? (
+          <div className="sh-blog-empty">Loading articles...</div>
+        ) : visiblePosts.length === 0 ? (
+          <div className="sh-blog-empty">
+            <FileText size={34} />
+            <h4>No articles found</h4>
+            <p>Create your first blog article.</p>
+          </div>
+        ) : (
+          <div className="sh-blog-post-list">
+            {visiblePosts.map(post => (
+              <article className="sh-blog-post" key={post.id}>
+                <div className="sh-blog-post-icon">
+                  <FileText size={24} />
+                </div>
+
+                <div className="sh-blog-post-info">
+                  <span>{post.category}</span>
+                  <h4>{post.title}</h4>
+                  <p>{post.excerpt || "No short description."}</p>
+                  <small>{post.created_at || ""}</small>
+                </div>
+
+                <span className={`sh-blog-status ${post.status}`}>
+                  {post.status}
+                </span>
+
+                <div className="sh-blog-post-actions">
+                  {post.status === "published" && (
+                    <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" title="View article">
+                      <Eye size={17} />
+                    </a>
+                  )}
+                  <button type="button" onClick={() => editPost(post)} title="Edit article">
+                    <Pencil size={17} />
+                  </button>
+                  <button type="button" onClick={() => deletePost(post)} title="Delete article">
+                    <Trash2 size={17} />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

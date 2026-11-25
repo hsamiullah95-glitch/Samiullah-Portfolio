@@ -1,0 +1,24 @@
+﻿.settings-page{max-width:1000px;margin:0 auto;padding:28px;color:#f4f6ff}
+.settings-heading{display:flex;align-items:center;gap:17px;margin-bottom:25px}
+.settings-heading-icon{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#6558e8,#3986e8);display:grid;place-items:center;color:white}
+.settings-eyebrow{font-size:10px;letter-spacing:2px;color:#8e9dff;font-weight:800}
+.settings-heading h2{font-size:25px;margin:5px 0}
+.settings-heading p,.settings-card-title p{color:#9eacc7;font-size:13px;margin:5px 0 0}
+.settings-card{background:#151f34;border:1px solid #2a3a58;border-radius:18px;padding:28px;max-width:760px;box-shadow:0 14px 40px #0002}
+.settings-card-title{display:flex;align-items:center;gap:13px;color:#8ea3ff;margin-bottom:22px}
+.settings-card-title h3{color:#f5f7ff;font-size:16px;margin:0}
+.settings-label{display:block;color:#dce4f7;font-size:13px;font-weight:650;margin:17px 0 8px}
+.settings-label span{color:#8e9bb5;font-weight:400}
+.settings-input{display:block;width:100%;box-sizing:border-box;border:1px solid #34435f;background:#0d1729;color:#fff;border-radius:10px;padding:13px 15px;font-size:14px;outline:none;transition:.2s}
+.settings-input:focus{border-color:#7770ff;box-shadow:0 0 0 3px #7168ff22}
+.settings-section-divider{height:1px;background:#2b3850;margin:27px 0}
+.settings-security-note{display:flex;align-items:center;gap:9px;color:#aab8d2;background:#101d31;border:1px solid #293b58;border-radius:10px;padding:13px;margin-top:22px;font-size:12px}
+.settings-security-note svg{color:#54d6a0;flex-shrink:0}
+.settings-alert{padding:12px 14px;border-radius:9px;margin-top:17px;font-size:13px}
+.settings-alert-error{background:#512633;color:#ffc1cb;border:1px solid #874052}
+.settings-alert-success{background:#153e36;color:#a5f4d2;border:1px solid #28745e}
+.settings-actions{display:flex;justify-content:flex-end;margin-top:24px}
+.settings-save-button{display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:10px;padding:13px 20px;background:linear-gradient(110deg,#6558e8,#4678e9);color:white;font-weight:700;cursor:pointer}
+.settings-save-button:disabled{opacity:.6;cursor:wait}
+.settings-loading{padding:40px;color:#cbd5eb;display:flex;gap:12px;align-items:center}
+@media(max-width:650px){.settings-page{padding:18px 12px}.settings-card{padding:19px}.settings-heading h2{font-size:21px}.settings-actions{justify-content:stretch}.settings-save-button{width:100%}}

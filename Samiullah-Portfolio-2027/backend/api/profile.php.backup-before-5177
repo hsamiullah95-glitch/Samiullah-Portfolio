@@ -1,0 +1,160 @@
+﻿<?php
+
+header("Content-Type: application/json; charset=UTF-8");
+$allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+$origin = $_SERVER["HTTP_ORIGIN"] ?? "";
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: " . $origin);
+    header("Vary: Origin");
+}
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(204);
+    exit;
+}
+
+session_start();
+
+require_once __DIR__ . "/../config/database.php";
+
+function profileResponse($success, $message, $data = null, $status = 200) {
+    http_response_code($status);
+    echo json_encode([
+        "success" => $success,
+        "message" => $message,
+        "data" => $data
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$method = $_SERVER["REQUEST_METHOD"];
+
+$keys = [
+    "full_name" => "profile_full_name",
+    "title" => "profile_title",
+    "bio" => "profile_bio",
+    "email" => "profile_email",
+    "phone" => "profile_phone",
+    "photo" => "profile_photo"
+];
+
+try {
+
+    // PUBLIC: LOAD PROFILE
+    if ($method === "GET") {
+        $stmt = $pdo->prepare(
+            "SELECT setting_key, setting_value
+             FROM site_settings
+             WHERE setting_key IN (?, ?, ?, ?, ?, ?)"
+        );
+
+        $stmt->execute(array_values($keys));
+        $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        $profile = [];
+
+        foreach ($keys as $field => $key) {
+            $profile[$field] = $rows[$key] ?? "";
+        }
+
+        profileResponse(true, "Profile loaded successfully.", $profile);
+    }
+
+    // ADMIN ONLY: UPDATE PROFILE
+    if ($method === "POST") {
+
+        if (!isset($_SESSION["admin_id"])) {
+            profileResponse(false, "Unauthorized. Please login first.", null, 401);
+        }
+
+        $profile = [];
+
+        foreach (["full_name", "title", "bio", "email", "phone"] as $field) {
+            $profile[$field] = trim($_POST[$field] ?? "");
+        }
+
+        if ($profile["full_name"] === "") {
+            profileResponse(false, "Full name is required.", null, 422);
+        }
+
+        if ($profile["email"] !== "" &&
+            !filter_var($profile["email"], FILTER_VALIDATE_EMAIL)) {
+            profileResponse(false, "Please enter a valid email address.", null, 422);
+        }
+
+        // Keep old photo if no new image is selected.
+        $oldStmt = $pdo->prepare(
+            "SELECT setting_value FROM site_settings WHERE setting_key = ?"
+        );
+        $oldStmt->execute([$keys["photo"]]);
+        $photo = $oldStmt->fetchColumn() ?: "";
+
+        if (isset($_FILES["photo"]) &&
+            $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE) {
+
+            if ($_FILES["photo"]["error"] !== UPLOAD_ERR_OK) {
+                profileResponse(false, "Photo upload failed.", null, 422);
+            }
+
+            if ($_FILES["photo"]["size"] > 5 * 1024 * 1024) {
+                profileResponse(false, "Photo must be smaller than 5 MB.", null, 422);
+            }
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime = $finfo->file($_FILES["photo"]["tmp_name"]);
+
+            $allowed = [
+                "image/jpeg" => "jpg",
+                "image/png" => "png",
+                "image/webp" => "webp"
+            ];
+
+            if (!isset($allowed[$mime])) {
+                profileResponse(false, "Only JPG, PNG and WEBP images are allowed.", null, 422);
+            }
+
+            $uploadDir = __DIR__ . "/../uploads/profile/";
+
+            if (!is_dir($uploadDir) &&
+                !mkdir($uploadDir, 0755, true)) {
+                profileResponse(false, "Could not create upload folder.", null, 500);
+            }
+
+            $filename = "profile_" . bin2hex(random_bytes(12)) . "." . $allowed[$mime];
+
+            if (!move_uploaded_file(
+                $_FILES["photo"]["tmp_name"],
+                $uploadDir . $filename
+            )) {
+                profileResponse(false, "Could not save profile photo.", null, 500);
+            }
+
+            $photo = "http://localhost:8001/uploads/profile/" . $filename;
+        }
+
+        $profile["photo"] = $photo;
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO site_settings (setting_key, setting_value)
+             VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)"
+        );
+
+        foreach ($keys as $field => $key) {
+            $stmt->execute([$key, $profile[$field]]);
+        }
+
+        profileResponse(true, "Profile updated successfully.", $profile);
+    }
+
+    profileResponse(false, "Method not allowed.", null, 405);
+
+} catch (Throwable $e) {
+    error_log("Profile API Error: " . $e->getMessage());
+    profileResponse(false, "Profile operation failed. Check PHP error log.", null, 500);
+}
+

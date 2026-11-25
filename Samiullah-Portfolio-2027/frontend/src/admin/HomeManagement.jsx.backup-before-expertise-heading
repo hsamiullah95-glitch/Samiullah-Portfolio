@@ -1,0 +1,359 @@
+﻿import { useEffect, useState } from "react";
+import {
+  Save,
+  RefreshCw,
+  Upload,
+  Image as ImageIcon,
+  FileJson,
+  CheckCircle,
+  AlertCircle
+} from "lucide-react";
+
+const API = "http://localhost:8001/api/home-content.php";
+
+const DEFAULT_CONTENT = {
+  hero: {
+    status: "COMPUTER SCIENCE STUDENT & IT ENTHUSIAST",
+    greeting: "ASSALAMUALAIKUM / HELLO, I'M",
+    firstName: "Samiullah",
+    lastName: "Hakimi.",
+    subtitle: "Web Developer & IT Professional",
+    description: "I am a Computer Science student passionate about web development, database systems and computer networking. I enjoy building useful digital solutions and continuously improving my skills.",
+    primaryButton: "Explore My Work",
+    secondaryButton: "Contact Me"
+  },
+  profile: {
+    image: "/images/samiullah-profile.jpg",
+    name: "Samiullah Hakimi",
+    title: "Web Developer & IT Enthusiast",
+    location: "Kandahar, Afghanistan"
+  },
+  stats: [
+    { icon: "GraduationCap", number: "04", label: "University Year" },
+    { icon: "BriefcaseBusiness", number: "1.5+", label: "Years IT Experience" },
+    { icon: "Code2", number: "08", label: "Core Technologies" }
+  ],
+  webSkills: [
+    { name: "HTML5", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" },
+    { name: "CSS3", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" },
+    { name: "JavaScript", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
+    { name: "React", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+    { name: "PHP", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" },
+    { name: "MySQL", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+    { name: "Laravel", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" },
+    { name: "Git", image: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" }
+  ],
+  networkSkills: [
+    { name: "CCNA", icon: "Network", detail: "Networking Fundamentals" },
+    { name: "Routing & Switching", icon: "Router", detail: "Network Configuration" },
+    { name: "MikroTik", icon: "Wifi", detail: "Network Administration" },
+    { name: "GNS3", icon: "Cable", detail: "Network Simulation" },
+    { name: "Windows Server", icon: "Server", detail: "Server Administration" },
+    { name: "DNS & DHCP", icon: "Globe", detail: "Network Services" },
+    { name: "SNMP", icon: "Monitor", detail: "Network Monitoring" },
+    { name: "TCP/IP", icon: "ShieldCheck", detail: "Network Protocols" }
+  ],
+  cctvSkills: [
+    { name: "IP Cameras", icon: "Camera", detail: "IP Camera Setup" },
+    { name: "CCTV Installation", icon: "ShieldCheck", detail: "Camera Installation" },
+    { name: "NVR / DVR", icon: "HardDrive", detail: "Recording Systems" },
+    { name: "IT Support", icon: "Laptop", detail: "Technical Support" },
+    { name: "Computer Hardware", icon: "Monitor", detail: "Hardware Troubleshooting" },
+    { name: "Windows Support", icon: "Monitor", detail: "Windows Configuration" }
+  ],
+  languages: [
+    { name: "Pashto", native: "پښتو", level: "Native", flag: "🇦🇫" },
+    { name: "Dari", native: "دري", level: "Fluent", flag: "🇦🇫" },
+    { name: "English", native: "English", level: "Good Knowledge", flag: "🌐" }
+  ],
+  expertise: [
+    {
+      icon: "Code2",
+      title: "Web Development",
+      description: "Building responsive and modern websites using HTML, CSS, JavaScript and React.",
+      linkText: "Explore Services"
+    },
+    {
+      icon: "Database",
+      title: "Database Development",
+      description: "Working with PHP and MySQL to build organized database-driven applications.",
+      linkText: "Explore Services"
+    },
+    {
+      icon: "Network",
+      title: "Networking & CCTV",
+      description: "Computer networking, network administration, IP cameras and IT support.",
+      linkText: "Explore Services"
+    }
+  ],
+  cta: {
+    eyebrow: "LET'S BUILD SOMETHING GREAT",
+    title: "Have a project in mind?",
+    description: "Let's work together and turn your ideas into useful digital experiences.",
+    button: "Let's Talk"
+  },
+  floatingSkills: {
+    first: "Web Development",
+    second: "Database Systems"
+  }
+};
+
+function parseResponse(text) {
+  let result = JSON.parse(text);
+  if (typeof result === "string") result = JSON.parse(result);
+  return result;
+}
+
+export default function HomeManagement() {
+  const [content, setContent] = useState(DEFAULT_CONTENT);
+  const [jsonText, setJsonText] = useState(
+    JSON.stringify(DEFAULT_CONTENT, null, 2)
+  );
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadContent() {
+      try {
+        const response = await fetch(API, { credentials: "include" });
+        const text = await response.text();
+        const result = parseResponse(text);
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Could not load Home Page content.");
+        }
+
+        const loaded = {
+          ...DEFAULT_CONTENT,
+          ...(result.data || {})
+        };
+
+        if (active) {
+          setContent(loaded);
+          setJsonText(JSON.stringify(loaded, null, 2));
+        }
+      } catch (err) {
+        if (active) {
+          setError("د Home معلومات لوستل نه شول. د API اتصال وګوره. " + err.message);
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadContent();
+    return () => { active = false; };
+  }, []);
+
+  function updateEditor(value) {
+    setJsonText(value);
+    setMessage("");
+    setError("");
+  }
+
+  async function saveContent() {
+    setSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const parsed = JSON.parse(jsonText);
+
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("اصلي JSON باید یو Object وي.");
+      }
+
+      const response = await fetch(API, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed)
+      });
+
+      const text = await response.text();
+      const result = parseResponse(text);
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Save failed.");
+      }
+
+      setContent(parsed);
+      setJsonText(JSON.stringify(parsed, null, 2));
+      setMessage("د Home Page معلومات په بریالیتوب خوندي شول.");
+    } catch (err) {
+      setError(
+        err instanceof SyntaxError
+          ? "JSON کې تېروتنه شته. کوډ او کامې (,) وګوره."
+          : err.message
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function uploadImage(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch(API, {
+        method: "POST",
+        credentials: "include",
+        body: formData
+      });
+
+      const text = await response.text();
+      const result = parseResponse(text);
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Image upload failed.");
+      }
+
+      const parsed = JSON.parse(jsonText);
+      parsed.profile = {
+        ...(parsed.profile || {}),
+        image: result.data.image
+      };
+
+      setContent(parsed);
+      setJsonText(JSON.stringify(parsed, null, 2));
+      setMessage("عکس پورته شو. اوس د عکس د لینک د خوندي کولو لپاره Save Changes ووهه.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  function resetEditor() {
+    setJsonText(JSON.stringify(content, null, 2));
+    setError("");
+    setMessage("Editor بېرته وروستي خوندي شوي معلوماتو ته راوګرځېد.");
+  }
+
+  return (
+    <div className="sh-content home-management">
+      <div className="sh-page-heading">
+        <div>
+          <span className="sh-section-label">WEBSITE MANAGEMENT</span>
+          <h2>Home Page Management</h2>
+          <p>د خپل Website د Home Page معلومات، عکسونه او مهارتونه اداره کړه.</p>
+        </div>
+      </div>
+
+      <div className="home-management-card">
+        <div className="home-management-card-heading">
+          <div className="home-management-heading-icon">
+            <FileJson size={23} />
+          </div>
+          <div>
+            <h3>Home Page Content Editor</h3>
+            <p>د Home Page ټول متنونه او معلومات په لاندې JSON کې بدلولای شې.</p>
+          </div>
+        </div>
+
+        <div className="home-image-upload">
+          <div className="home-image-preview">
+            {content.profile?.image ? (
+              <img src={content.profile.image} alt="Home profile preview" />
+            ) : (
+              <ImageIcon size={32} />
+            )}
+          </div>
+          <div className="home-image-upload-info">
+            <strong>Home Profile Image</strong>
+            <p>JPG، PNG یا WEBP؛ تر 5MB پورې.</p>
+            <label className="home-upload-button">
+              <Upload size={16} />
+              {uploading ? "Uploading..." : "Upload New Image"}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={uploadImage}
+                disabled={uploading}
+                hidden
+              />
+            </label>
+          </div>
+        </div>
+
+        {message && (
+          <div className="home-editor-message success">
+            <CheckCircle size={18} />
+            {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="home-editor-message error">
+            <AlertCircle size={18} />
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="home-editor-loading">
+            <RefreshCw size={20} /> Loading Home Page content...
+          </div>
+        ) : (
+          <>
+            <label className="home-json-label" htmlFor="home-json-editor">
+              Home Page Data (JSON)
+            </label>
+            <textarea
+              id="home-json-editor"
+              className="home-json-editor"
+              value={jsonText}
+              onChange={(event) => updateEditor(event.target.value)}
+              spellCheck={false}
+              rows={30}
+            />
+
+            <div className="home-json-help">
+              <strong>لارښوونه:</strong>
+              <span>
+                د متنونو د بدلولو پر مهال د JSON نښې، قوسونه او کامې مه حذفوه.
+                د بدلونونو وروسته Save Changes ووهه.
+              </span>
+            </div>
+
+            <div className="home-editor-actions">
+              <button
+                type="button"
+                className="home-save-button"
+                onClick={saveContent}
+                disabled={saving || uploading}
+              >
+                <Save size={17} />
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+
+              <button
+                type="button"
+                className="home-reset-button"
+                onClick={resetEditor}
+                disabled={saving || uploading}
+              >
+                <RefreshCw size={16} />
+                Reset Editor
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

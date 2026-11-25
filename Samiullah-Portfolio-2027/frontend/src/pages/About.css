@@ -1,0 +1,957 @@
+
+
+/* =========================================
+   SAMIULLAH HAKIMI - ABOUT PAGE
+   Premium Black & Gold Design
+========================================= */
+
+.about-page {
+  --about-gold: #c49a45;
+  --about-gold-light: #e0bd72;
+  --about-gold-soft: rgba(196, 154, 69, 0.12);
+  --about-bg: var(--bg-color, #ffffff);
+  --about-card: var(--card-bg, #ffffff);
+  --about-text: var(--text-color, #171717);
+  --about-muted: var(--text-secondary, #777777);
+  --about-border: var(--border-color, #e9e9e9);
+
+  position: relative;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 55px 55px 100px;
+  color: var(--about-text);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.about-page *,
+.about-page *::before,
+.about-page *::after {
+  box-sizing: border-box;
+}
+
+.about-page a {
+  text-decoration: none;
+}
+
+/* =========================================
+   HERO
+========================================= */
+
+.about-hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 260px;
+  margin-bottom: 90px;
+  padding: 45px 25px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(196, 154, 69, 0.14),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      var(--about-card),
+      var(--about-bg)
+    );
+  border: 1px solid var(--about-border);
+}
+
+.about-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.about-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--about-gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.about-eyebrow-line {
+  display: inline-block;
+  width: 25px;
+  height: 2px;
+  background: var(--about-gold);
+}
+
+.about-hero h1 {
+  margin: 18px 0 12px;
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+}
+
+.about-hero h1 span {
+  color: var(--about-gold);
+}
+
+.about-hero-content > p {
+  max-width: 550px;
+  margin: 0 auto;
+  color: var(--about-muted);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.about-breadcrumb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 23px;
+  font-size: 13px;
+  color: var(--about-muted);
+}
+
+.about-breadcrumb a {
+  color: var(--about-gold);
+}
+
+.about-hero-decoration {
+  position: absolute;
+  right: -20px;
+  bottom: -42px;
+  color: var(--about-gold);
+  opacity: 0.035;
+  font-size: 145px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  pointer-events: none;
+}
+
+/* =========================================
+   INTRODUCTION
+========================================= */
+
+.about-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: 75px;
+  padding: 10px 25px 85px;
+  margin-bottom: 30px;
+}
+
+.about-image-column {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.about-image-frame {
+  position: relative;
+  width: 100%;
+}
+
+.about-image-backdrop {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 75%;
+  height: 75%;
+  border: 2px solid var(--about-gold);
+  border-radius: 20px;
+}
+
+.about-profile-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 18px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.13);
+}
+
+.about-image-caption {
+  position: absolute;
+  z-index: 2;
+  bottom: 18px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 15px 10px;
+  border-radius: 11px;
+  background: rgba(15, 15, 15, 0.87);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+}
+
+.about-status-dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #43c77c;
+}
+
+.about-image-experience {
+  position: absolute;
+  z-index: 3;
+  right: -30px;
+  bottom: 45px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  border-radius: 13px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.about-image-experience svg {
+  color: var(--about-gold);
+}
+
+.about-image-experience strong,
+.about-image-experience span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.about-image-experience span {
+  color: var(--about-muted);
+}
+
+.about-intro-content {
+  min-width: 0;
+}
+
+.about-intro-content h2 {
+  margin: 18px 0 22px;
+  font-size: clamp(29px, 3.3vw, 42px);
+  line-height: 1.4;
+  letter-spacing: -0.8px;
+}
+
+.about-intro-content h2 span,
+.about-section-heading h2 span,
+.about-interest-heading h2 span {
+  color: var(--about-gold);
+}
+
+.about-intro-content > p {
+  margin: 0 0 17px;
+  color: var(--about-muted);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.about-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0;
+  color: var(--about-gold);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.about-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  margin: 25px 0;
+}
+
+.about-fact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--about-border);
+  background: var(--about-card);
+  transition: 0.3s ease;
+}
+
+.about-fact:hover {
+  border-color: var(--about-gold);
+  transform: translateY(-3px);
+}
+
+.about-fact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  color: var(--about-gold);
+  background: var(--about-gold-soft);
+}
+
+.about-fact span,
+.about-fact strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.about-fact span {
+  margin-bottom: 4px;
+  color: var(--about-muted);
+  font-size: 10px;
+}
+
+.about-fact strong {
+  font-size: 12px;
+}
+
+.about-primary-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 50px;
+  padding: 14px 25px;
+  border: 1px solid var(--about-gold);
+  border-radius: 7px;
+  background: var(--about-gold);
+  color: #ffffff !important;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.3s ease;
+}
+
+.about-primary-button:hover {
+  background: transparent;
+  color: var(--about-gold) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(196, 154, 69, 0.15);
+}
+
+/* =========================================
+   GENERAL SECTIONS
+========================================= */
+
+.about-section {
+  padding: 75px 10px;
+  margin-bottom: 20px;
+}
+
+.about-section-heading {
+  max-width: 700px;
+  margin: 0 auto 45px;
+  text-align: center;
+}
+
+.about-section-heading h2 {
+  margin: 17px 0 12px;
+  font-size: clamp(27px, 3.4vw, 38px);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.about-section-heading p {
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+/* =========================================
+   EDUCATION
+========================================= */
+
+.about-education-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.about-education-card {
+  position: relative;
+  padding: 32px;
+  overflow: hidden;
+  border: 1px solid var(--about-border);
+  border-radius: 16px;
+  background: var(--about-card);
+  transition: 0.35s ease;
+}
+
+.about-education-card:hover {
+  transform: translateY(-7px);
+  border-color: var(--about-gold);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.07);
+}
+
+.about-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 27px;
+}
+
+.about-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 13px;
+  background: var(--about-gold-soft);
+  color: var(--about-gold);
+}
+
+.about-card-number {
+  color: var(--about-gold);
+  font-size: 30px;
+  font-weight: 800;
+  opacity: 0.65;
+}
+
+.about-card-label {
+  color: var(--about-gold);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.about-education-card h3 {
+  margin: 13px 0;
+  font-size: 21px;
+  line-height: 1.5;
+}
+
+.about-education-card > p {
+  color: var(--about-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.about-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px solid var(--about-border);
+  color: var(--about-muted);
+  font-size: 12px;
+}
+
+.about-card-footer svg {
+  color: var(--about-gold);
+}
+
+/* =========================================
+   EXPERIENCE
+========================================= */
+
+.about-experience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.about-experience-card {
+  padding: 30px;
+  border: 1px solid var(--about-border);
+  border-radius: 16px;
+  background: var(--about-card);
+  transition: 0.35s ease;
+}
+
+.about-experience-card:hover {
+  transform: translateY(-7px);
+  border-color: var(--about-gold);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07);
+}
+
+.about-experience-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 23px;
+}
+
+.about-experience-period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 17px;
+  color: var(--about-gold);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.about-experience-card h3 {
+  margin: 0 0 9px;
+  font-size: 21px;
+}
+
+.about-experience-card h4 {
+  margin: 0 0 15px;
+  color: var(--about-gold);
+  font-size: 14px;
+}
+
+.about-experience-card > p {
+  min-height: 85px;
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.about-experience-bottom {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 23px;
+  padding-top: 18px;
+  border-top: 1px solid var(--about-border);
+  color: var(--about-muted);
+  font-size: 12px;
+}
+
+.about-experience-bottom svg {
+  color: var(--about-gold);
+}
+
+/* =========================================
+   SKILLS
+========================================= */
+
+.about-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.about-skill-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid var(--about-border);
+  border-radius: 13px;
+  background: var(--about-card);
+  transition: 0.3s ease;
+}
+
+.about-skill-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--about-gold);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.about-skill-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  color: var(--about-gold);
+  background: var(--about-gold-soft);
+}
+
+.about-skill-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.about-skill-content h3 {
+  margin: 0 0 7px;
+  font-size: 14px;
+}
+
+.about-skill-content p {
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.about-skill-arrow {
+  flex-shrink: 0;
+  color: var(--about-gold);
+  transition: transform 0.3s ease;
+}
+
+.about-skill-card:hover .about-skill-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* =========================================
+   CERTIFICATE
+========================================= */
+
+.about-certificate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 27px;
+  min-height: 190px;
+  margin: 50px 0 75px;
+  padding: 35px 40px;
+  overflow: hidden;
+  border: 1px solid rgba(196, 154, 69, 0.35);
+  border-radius: 17px;
+  background: var(--about-card);
+}
+
+.about-certificate-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 75px;
+  height: 75px;
+  border-radius: 15px;
+  background: var(--about-gold-soft);
+  color: var(--about-gold);
+}
+
+.about-certificate-content {
+  position: relative;
+  z-index: 2;
+}
+
+.about-certificate-content h2 {
+  margin: 12px 0;
+  font-size: 22px;
+}
+
+.about-certificate-content > p {
+  color: var(--about-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.about-certificate-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  color: var(--about-gold);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.about-certificate-decoration {
+  position: absolute;
+  right: 35px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--about-gold);
+  opacity: 0.09;
+}
+
+/* =========================================
+   INTERESTS
+========================================= */
+
+.about-interest {
+  padding: 55px 30px;
+  margin-bottom: 70px;
+  border-radius: 17px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+}
+
+.about-interest-heading {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.about-interest-heading h2 {
+  margin: 15px 0;
+  font-size: 27px;
+}
+
+.about-interest-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 13px;
+}
+
+.about-interest-list > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border: 1px solid var(--about-border);
+  border-radius: 9px;
+  color: var(--about-text);
+  font-size: 12px;
+  transition: 0.3s ease;
+}
+
+.about-interest-list > div svg {
+  color: var(--about-gold);
+}
+
+.about-interest-list > div:hover {
+  border-color: var(--about-gold);
+  background: var(--about-gold-soft);
+  transform: translateY(-3px);
+}
+
+/* =========================================
+   CONTACT CTA
+========================================= */
+
+.about-cta {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 340px;
+  padding: 65px 30px;
+  overflow: hidden;
+  border: 1px solid rgba(196, 154, 69, 0.35);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 90% 20%,
+      rgba(196, 154, 69, 0.15),
+      transparent 35%
+    ),
+    var(--about-card);
+}
+
+.about-cta-content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  text-align: center;
+}
+
+.about-cta-content h2 {
+  margin: 18px 0;
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.5;
+}
+
+.about-cta-content p {
+  max-width: 560px;
+  margin: 0 auto 27px;
+  color: var(--about-muted);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.about-cta-decoration {
+  position: absolute;
+  right: 30px;
+  bottom: -45px;
+  color: var(--about-gold);
+  opacity: 0.06;
+}
+
+/* =========================================
+   RESPONSIVE - TABLETS
+========================================= */
+
+@media (max-width: 1000px) {
+  .about-page {
+    padding: 45px 30px 80px;
+  }
+
+  .about-intro {
+    gap: 45px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .about-profile-image {
+    height: 420px;
+  }
+
+  .about-image-experience {
+    right: -15px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+  .about-page {
+    padding: 30px 22px 65px;
+  }
+
+  .about-hero {
+    min-height: 230px;
+    margin-bottom: 55px;
+  }
+
+  .about-intro {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 10px 0 45px;
+  }
+
+  .about-image-column {
+    max-width: 370px;
+  }
+
+  .about-profile-image {
+    height: 430px;
+  }
+
+  .about-intro-content {
+    padding: 0 5px;
+  }
+
+  .about-education-grid,
+  .about-experience-grid,
+  .about-skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-section {
+    padding: 45px 0;
+  }
+
+  .about-certificate {
+    padding: 27px;
+  }
+
+  .about-interest {
+    padding: 40px 20px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - SMALL PHONES
+========================================= */
+
+@media (max-width: 480px) {
+  .about-page {
+    padding: 22px 16px 50px;
+  }
+
+  .about-hero {
+    min-height: 210px;
+    padding: 30px 15px;
+    border-radius: 14px;
+  }
+
+  .about-hero h1 {
+    font-size: 37px;
+  }
+
+  .about-hero-decoration {
+    font-size: 90px;
+  }
+
+  .about-profile-image {
+    height: 360px;
+  }
+
+  .about-image-experience {
+    right: -5px;
+    bottom: 35px;
+    padding: 12px;
+  }
+
+  .about-facts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-education-card,
+  .about-experience-card {
+    padding: 23px;
+  }
+
+  .about-section-heading {
+    margin-bottom: 30px;
+  }
+
+  .about-section-heading h2 {
+    font-size: 26px;
+  }
+
+  .about-skill-card {
+    padding: 17px;
+    gap: 12px;
+  }
+
+  .about-skill-icon {
+    width: 43px;
+    height: 43px;
+  }
+
+  .about-certificate {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 25px;
+  }
+
+  .about-certificate-decoration {
+    right: 10px;
+    top: 30px;
+    transform: none;
+  }
+
+  .about-certificate-content h2 {
+    font-size: 20px;
+  }
+
+  .about-interest-heading h2 {
+    font-size: 23px;
+  }
+
+  .about-interest-list {
+    flex-direction: column;
+  }
+
+  .about-interest-list > div {
+    width: 100%;
+  }
+
+  .about-cta {
+    min-height: 300px;
+    padding: 45px 20px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .about-page *,
+  .about-page *::before,
+  .about-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,371 @@
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  PackagePlus, Search, Pencil, Trash2, UploadCloud,
+  ExternalLink, X, Image as ImageIcon, Eye, EyeOff,
+  Package, CheckCircle2, AlertCircle
+} from "lucide-react";
+import "./ProductsManagement.css";
+
+const API = "http://localhost:8001/api/products.php";
+
+const categories = [
+  { value: "portfolio", label: "Portfolio" },
+  { value: "applications", label: "Applications" },
+  { value: "projects", label: "Projects" }
+];
+
+const emptyForm = {
+  title: "",
+  category: "applications",
+  description: "",
+  image: "",
+  product_url: "",
+  github_url: "",
+  is_active: 1
+};
+
+export default function ProductsManagement() {
+  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const fileRef = useRef(null);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(API, { credentials: "include" });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not load products.");
+      }
+      setProducts(Array.isArray(result.data) ? result.data : []);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Connection failed. Check PHP server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const stats = useMemo(() => ({
+    total: products.length,
+    active: products.filter(p => Number(p.is_active) === 1).length,
+    inactive: products.filter(p => Number(p.is_active) === 0).length
+  }), [products]);
+
+  const visibleProducts = useMemo(() => {
+    return products.filter(product => {
+      const term = search.toLowerCase();
+      const matchesSearch =
+        String(product.title || "").toLowerCase().includes(term) ||
+        String(product.description || "").toLowerCase().includes(term);
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "active" && Number(product.is_active) === 1) ||
+        (filter === "inactive" && Number(product.is_active) === 0);
+      return matchesSearch && matchesFilter;
+    });
+  }, [products, search, filter]);
+
+  const updateField = (key, value) => {
+    setForm(current => ({ ...current, [key]: value }));
+  };
+
+  const resetForm = () => {
+    setForm(emptyForm);
+    setEditingId(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const uploadImage = async file => {
+    if (!file) return;
+    const data = new FormData();
+    data.append("action", "upload");
+    data.append("image", file);
+
+    setUploading(true);
+    setError("");
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        credentials: "include",
+        body: data
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Image upload failed.");
+      }
+      updateField("image", result.data.image);
+      setNotice("Image uploaded successfully.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const saveProduct = async event => {
+    event.preventDefault();
+    if (!form.title.trim() || !form.description.trim()) {
+      setError("Please enter product name and description.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setNotice("");
+
+    try {
+      const payload = {
+        ...form,
+        ...(editingId ? { id: editingId } : {})
+      };
+      const response = await fetch(API, {
+        method: editingId ? "PUT" : "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Could not save product.");
+      }
+
+      setNotice(editingId ? "Product updated successfully." : "Product added successfully.");
+      resetForm();
+      await loadProducts();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const editProduct = product => {
+    setEditingId(Number(product.id));
+    setForm({
+      title: product.title || "",
+      category: product.category || "applications",
+      description: product.description || "",
+      image: product.image || "",
+      product_url: product.product_url || "",
+      github_url: product.github_url || "",
+      is_active: Number(product.is_active)
+    });
+    setError("");
+    setNotice("");
+    document.querySelector(".sh-products-editor")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  };
+
+  const deleteProduct = async product => {
+    if (!window.confirm(`Delete "${product.title}"? This cannot be undone.`)) return;
+
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(API, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: Number(product.id) })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Delete failed.");
+      }
+      setNotice("Product deleted successfully.");
+      await loadProducts();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const toggleStatus = async product => {
+    try {
+      const response = await fetch(API, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: Number(product.id),
+          title: product.title,
+          category: product.category,
+          description: product.description,
+          image: product.image || "",
+          product_url: product.product_url || "",
+      github_url: product.github_url || "",
+          is_active: Number(product.is_active) === 1 ? 0 : 1
+        })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Status update failed.");
+      }
+      await loadProducts();
+      setNotice("Product status updated.");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const imageUrl = image => {
+    if (!image) return "";
+    if (/^https?:\/\//i.test(image)) return image;
+    return `http://localhost:5173${image.startsWith("/") ? "" : "/"}${image}`;
+  };
+
+  return (
+    <div className="sh-products">
+      <div className="sh-products-heading">
+        <div>
+          <span className="sh-products-eyebrow">CONTENT MANAGEMENT</span>
+          <h2>My Products <span>âœ¦</span></h2>
+          <p>Manage your digital products, applications and projects.</p>
+        </div>
+        <button className="sh-products-refresh" onClick={loadProducts} type="button">
+          <Package size={17} /> Refresh
+        </button>
+      </div>
+
+      <div className="sh-products-stats">
+        <div className="sh-products-stat">
+          <span className="sh-products-stat-icon purple"><Package size={21} /></span>
+          <div><small>Total Products</small><strong>{stats.total}</strong></div>
+        </div>
+        <div className="sh-products-stat">
+          <span className="sh-products-stat-icon green"><CheckCircle2 size={21} /></span>
+          <div><small>Active Products</small><strong>{stats.active}</strong></div>
+        </div>
+        <div className="sh-products-stat">
+          <span className="sh-products-stat-icon amber"><EyeOff size={21} /></span>
+          <div><small>Inactive Products</small><strong>{stats.inactive}</strong></div>
+        </div>
+      </div>
+
+      {notice && <div className="sh-products-alert success"><CheckCircle2 size={17} />{notice}<button onClick={() => setNotice("")}><X size={16}/></button></div>}
+      {error && <div className="sh-products-alert danger"><AlertCircle size={17} />{error}<button onClick={() => setError("")}><X size={16}/></button></div>}
+
+      <div className="sh-products-layout">
+        <section className="sh-products-editor">
+          <div className="sh-products-section-title">
+            <div>
+              <span className="sh-products-mini-label">{editingId ? "UPDATE ITEM" : "CREATE NEW"}</span>
+              <h3>{editingId ? "Edit Product" : "Add New Product"}</h3>
+            </div>
+            {editingId && <button className="sh-products-cancel" onClick={resetForm} type="button"><X size={16}/> Cancel</button>}
+          </div>
+
+          <form onSubmit={saveProduct}>
+            <label>Product Name *</label>
+            <input value={form.title} onChange={e => updateField("title", e.target.value)} placeholder="Enter product name" maxLength={255} required />
+
+            <label>Category *</label>
+            <select value={form.category} onChange={e => updateField("category", e.target.value)}>
+              {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+
+            <label>Description *</label>
+            <textarea value={form.description} onChange={e => updateField("description", e.target.value)} placeholder="Write a short product description..." rows={4} required />
+
+            <label>Product Image</label>
+            <div className="sh-products-upload" onClick={() => fileRef.current?.click()}>
+              {form.image ? (
+                <img src={imageUrl(form.image)} alt="Product preview" />
+              ) : (
+                <span className="sh-products-upload-icon"><UploadCloud size={27}/></span>
+              )}
+              <div>
+                <strong>{uploading ? "Uploading image..." : form.image ? "Change image" : "Click to upload image"}</strong>
+                <small>JPG, PNG, WEBP or GIF Â· Max 5 MB</small>
+              </div>
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={e => uploadImage(e.target.files?.[0])} />
+            </div>
+
+            <label>Product Link <span>(optional)</span></label>
+            <input value={form.product_url} onChange={e => updateField("product_url", e.target.value)} placeholder="https://example.com" maxLength={500} />
+
+            <label>Visibility</label>
+            <select value={String(form.is_active)} onChange={e => updateField("is_active", Number(e.target.value))}>
+              <option value="1">Active â€” Visible</option>
+              <option value="0">Inactive â€” Hidden</option>
+            </select>
+
+            <button className="sh-products-submit" type="submit" disabled={saving || uploading}>
+              <PackagePlus size={18}/>{saving ? "Saving..." : editingId ? "Update Product" : "Save Product"}
+            </button>
+          </form>
+        </section>
+
+        <section className="sh-products-list">
+          <div className="sh-products-section-title">
+            <div>
+              <span className="sh-products-mini-label">YOUR COLLECTION</span>
+              <h3>All Products <span className="sh-products-count">{visibleProducts.length}</span></h3>
+            </div>
+          </div>
+
+          <div className="sh-products-toolbar">
+            <div className="sh-products-search"><Search size={17}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." /></div>
+            <select value={filter} onChange={e => setFilter(e.target.value)} aria-label="Filter products">
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {loading ? (
+            <div className="sh-products-empty"><div className="sh-products-loader"></div><p>Loading products...</p></div>
+          ) : visibleProducts.length === 0 ? (
+            <div className="sh-products-empty">
+              <span><ImageIcon size={32}/></span>
+              <h4>No products found</h4>
+              <p>Add your first product using the form.</p>
+            </div>
+          ) : (
+            <div className="sh-products-grid">
+              {visibleProducts.map(product => (
+                <article className="sh-product-card" key={product.id}>
+                  <div className="sh-product-image">
+                    {product.image ? <img src={imageUrl(product.image)} alt={product.title} /> : <div className="sh-product-no-image"><ImageIcon size={34}/></div>}
+                    <span className={`sh-product-status ${Number(product.is_active) === 1 ? "is-active" : "is-inactive"}`}>
+                      {Number(product.is_active) === 1 ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                  <div className="sh-product-card-body">
+                    <span className="sh-product-category">{product.category}</span>
+                    <h4>{product.title}</h4>
+                    <p>{product.description}</p>
+                    <div className="sh-product-actions">
+                      <button className="edit" onClick={() => editProduct(product)} type="button"><Pencil size={15}/> Edit</button>
+                      <button className="visibility" onClick={() => toggleStatus(product)} type="button" title="Change visibility">
+                        {Number(product.is_active) === 1 ? <EyeOff size={16}/> : <Eye size={16}/>}
+                      </button>
+                      {product.product_url && <a href={product.product_url} target="_blank" rel="noreferrer" title="Open product"><ExternalLink size={16}/></a>}
+                      <button className="delete" onClick={() => deleteProduct(product)} type="button" title="Delete product"><Trash2 size={16}/></button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+

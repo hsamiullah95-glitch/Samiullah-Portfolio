@@ -1,0 +1,316 @@
+﻿<?php
+
+header("Content-Type: application/json; charset=UTF-8");
+
+$allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+$origin = $_SERVER["HTTP_ORIGIN"] ?? "";
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: " . $origin);
+    header("Vary: Origin");
+}
+
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(204);
+    exit;
+}
+
+session_set_cookie_params([
+    "lifetime" => 0,
+    "path" => "/",
+    "httponly" => true,
+    "samesite" => "Lax"
+]);
+
+session_start();
+
+$method = $_SERVER["REQUEST_METHOD"];
+
+if ($method !== "GET" && !isset($_SESSION["admin_id"])) {
+    http_response_code(401);
+    echo json_encode([
+        "success" => false,
+        "message" => "Unauthorized. Please login first."
+    ]);
+    exit;
+}
+
+require_once __DIR__ . "/../config/database.php";
+
+function sendResponse($success, $message, $data = null, $status = 200) {
+    http_response_code($status);
+
+    echo json_encode([
+        "success" => $success,
+        "message" => $message,
+        "data" => $data
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
+$method = $_SERVER["REQUEST_METHOD"];
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (!is_array($input)) {
+    $input = [];
+}
+
+$allowedCategories = ["portfolio", "applications", "projects"];
+
+try {
+
+    // GET PRODUCTS
+    if ($method === "GET") {
+        $publicOnly = ($_GET["public"] ?? "") === "1";
+
+        $sql = $publicOnly
+            ? "SELECT * FROM products WHERE is_active = 1 ORDER BY id DESC"
+            : "SELECT * FROM products ORDER BY id DESC";
+
+        $stmt = $pdo->query($sql);
+
+        sendResponse(
+            true,
+            "Products loaded successfully.",
+            $stmt->fetchAll(PDO::FETCH_ASSOC)
+        );
+    }
+
+    // POST: UPLOAD PRODUCT IMAGE
+    if ($method === "POST" && ($_POST["action"] ?? "") === "upload") {
+
+        if (
+            !isset($_FILES["image"]) ||
+            $_FILES["image"]["error"] !== UPLOAD_ERR_OK
+        ) {
+            sendResponse(false, "Please select a valid image.", null, 422);
+        }
+
+        $image = $_FILES["image"];
+
+        if ($image["size"] > 5 * 1024 * 1024) {
+            sendResponse(false, "Image size must be 5 MB or less.", null, 422);
+        }
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($image["tmp_name"]);
+
+        $allowedTypes = [
+            "image/jpeg" => "jpg",
+            "image/png" => "png",
+            "image/webp" => "webp",
+            "image/gif" => "gif"
+        ];
+
+        if (!isset($allowedTypes[$mime])) {
+            sendResponse(false, "Only JPG, PNG, WEBP and GIF images are allowed.", null, 422);
+        }
+
+        $uploadDir = dirname(__DIR__, 2) . "/frontend/public/uploads/products/";
+
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                sendResponse(false, "Could not create upload directory.", null, 500);
+            }
+        }
+
+        $filename = bin2hex(random_bytes(16)) . "." . $allowedTypes[$mime];
+        $destination = $uploadDir . $filename;
+
+        if (!move_uploaded_file($image["tmp_name"], $destination)) {
+            sendResponse(false, "Image upload failed.", null, 500);
+        }
+
+        sendResponse(
+            true,
+            "Product image uploaded successfully.",
+            ["image" => "/uploads/products/" . $filename]
+        );
+    }
+
+    // ADD PRODUCT
+    if ($method === "POST") {
+
+        $title = trim($input["title"] ?? "");
+        $category = trim($input["category"] ?? "");
+        $description = trim($input["description"] ?? "");
+        $image = trim($input["image"] ?? "");
+        $productUrl = trim($input["product_url"] ?? "");
+        $githubUrl = trim($input["github_url"] ?? "");
+        $isActive = isset($input["is_active"])
+            ? (int)$input["is_active"]
+            : 1;
+
+        foreach (["Live Demo" => $productUrl, "GitHub" => $githubUrl] as $label => $url) {
+            if ($url !== "") {
+                $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
+                if (!filter_var($url, FILTER_VALIDATE_URL) || !in_array($scheme, ["http", "https"], true)) {
+                    sendResponse(false, "Invalid " . $label . " URL. Use http:// or https://", null, 422);
+                }
+            }
+        }
+
+        if ($title === "" || $description === "") {
+            sendResponse(false, "Title and description are required.", null, 422);
+        }
+
+        if (!in_array($category, $allowedCategories, true)) {
+            sendResponse(false, "Invalid product category.", null, 422);
+        }
+
+        if (!in_array($isActive, [0, 1], true)) {
+            sendResponse(false, "Invalid active value.", null, 422);
+        }
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO products
+            (title, category, description, image, product_url, github_url, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?)"
+        );
+
+        $stmt->execute([
+            $title,
+            $category,
+            $description,
+            $image ?: null,
+            $productUrl ?: null,
+            $githubUrl ?: null,
+            $isActive
+        ]);
+
+        sendResponse(
+            true,
+            "Product added successfully.",
+            ["id" => (int)$pdo->lastInsertId()],
+            201
+        );
+    }
+
+    // UPDATE PRODUCT
+    if ($method === "PUT") {
+
+        $id = (int)($input["id"] ?? 0);
+
+        if ($id <= 0) {
+            sendResponse(false, "Valid product ID is required.", null, 422);
+        }
+
+        $title = trim($input["title"] ?? "");
+        $category = trim($input["category"] ?? "");
+        $description = trim($input["description"] ?? "");
+        $image = trim($input["image"] ?? "");
+        $productUrl = trim($input["product_url"] ?? "");
+        $githubUrl = trim($input["github_url"] ?? "");
+        $isActive = isset($input["is_active"])
+            ? (int)$input["is_active"]
+            : 1;
+
+        foreach (["Live Demo" => $productUrl, "GitHub" => $githubUrl] as $label => $url) {
+            if ($url !== "") {
+                $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
+                if (!filter_var($url, FILTER_VALIDATE_URL) || !in_array($scheme, ["http", "https"], true)) {
+                    sendResponse(false, "Invalid " . $label . " URL. Use http:// or https://", null, 422);
+                }
+            }
+        }
+
+        if ($title === "" || $description === "") {
+            sendResponse(false, "Title and description are required.", null, 422);
+        }
+
+        if (!in_array($category, $allowedCategories, true)) {
+            sendResponse(false, "Invalid product category.", null, 422);
+        }
+
+        if (!in_array($isActive, [0, 1], true)) {
+            sendResponse(false, "Invalid active value.", null, 422);
+        }
+
+        $stmt = $pdo->prepare(
+            "UPDATE products SET
+                title = ?,
+                category = ?,
+                description = ?,
+                image = ?,
+                product_url = ?,
+                github_url = ?,
+                is_active = ?
+            WHERE id = ?"
+        );
+
+        $stmt->execute([
+            $title,
+            $category,
+            $description,
+            $image ?: null,
+            $productUrl ?: null,
+            $githubUrl ?: null,
+            $isActive,
+            $id
+        ]);
+
+        if ($stmt->rowCount() === 0) {
+            $check = $pdo->prepare("SELECT id FROM products WHERE id = ?");
+            $check->execute([$id]);
+
+            if (!$check->fetch()) {
+                sendResponse(false, "Product not found.", null, 404);
+            }
+        }
+
+        sendResponse(true, "Product updated successfully.");
+    }
+
+    // DELETE PRODUCT
+    if ($method === "DELETE") {
+
+        $id = (int)($input["id"] ?? 0);
+
+        if ($id <= 0) {
+            sendResponse(false, "Valid product ID is required.", null, 422);
+        }
+
+        $stmt = $pdo->prepare(
+            "DELETE FROM products WHERE id = ?"
+        );
+
+        $stmt->execute([$id]);
+
+        if ($stmt->rowCount() === 0) {
+            sendResponse(false, "Product not found.", null, 404);
+        }
+
+        sendResponse(true, "Product deleted successfully.");
+    }
+
+    sendResponse(false, "Method not allowed.", null, 405);
+
+} catch (PDOException $e) {
+
+    error_log($e->getMessage());
+
+    sendResponse(
+        false,
+        "Database operation failed. Check PHP error log.",
+        null,
+        500
+    );
+
+} catch (Throwable $e) {
+
+    error_log($e->getMessage());
+
+    sendResponse(
+        false,
+        "Server operation failed. Check PHP error log.",
+        null,
+        500
+    );
+}
+
+

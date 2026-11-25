@@ -1,0 +1,305 @@
+﻿import { useEffect, useState } from "react";
+import { Outlet, NavLink, Link } from "react-router-dom";
+import {
+  ArrowUpRight,
+  ArrowRight,
+  ChevronDown,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
+
+const API = "http://localhost:8001/api/header-footer.php";
+
+const DEFAULT_SETTINGS = {
+  brand_name: "Samiullah Hakimi",
+  footer_tagline: "Web Developer & IT Enthusiast",
+  footer_description:
+    "I build modern websites, web applications, database systems and practical IT solutions.",
+  footer_cta_title: "Let's Build Something Great Together.",
+  footer_cta_text: "Have an idea? Let's turn it into reality.",
+  footer_location: "Kandahar, Afghanistan",
+  footer_email: "Contact through website",
+  footer_phone: "Contact details coming soon",
+  footer_copyright: "",
+  facebook_url: "",
+  instagram_url: "",
+  linkedin_url: "",
+  github_url: "",
+};
+
+const services = [
+  ["Website & UI/UX Design", "/services#website-design"],
+  ["Web Development", "/services#web-development"],
+  ["Networking & IT", "/services#networking-it"],
+  ["Database & Hosting", "/services#database-hosting"],
+];
+
+const products = [
+  ["My Portfolio", "/products/portfolio"],
+  ["Web Applications", "/products/applications"],
+  ["Student Projects", "/products/projects"],
+];
+
+const tools = [
+  ["HTML Tools", "/tools/html"],
+  ["CSS Tools", "/tools/css"],
+  ["JavaScript Tools", "/tools/javascript"],
+  ["Network Tools", "/tools/network"],
+];
+
+const pages = [
+  ["Home", "/"],
+  ["About", "/about"],
+  ["Portfolio", "/portfolio"],
+  ["Contact", "/contact"],
+];
+
+export default function SiteLayout() {
+  const [dark, setDark] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const [dropdown, setDropdown] = useState("");
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadHeaderFooter() {
+      try {
+        const response = await fetch(API, {
+          credentials: "include",
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Could not load website settings.");
+        }
+
+        if (active && result.data) {
+          setSettings({
+            ...DEFAULT_SETTINGS,
+            ...result.data,
+          });
+        }
+      } catch (error) {
+        console.error("Header/Footer settings:", error);
+      }
+    }
+
+    loadHeaderFooter();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const close = () => {
+    setMobile(false);
+    setDropdown("");
+  };
+
+  const drop = (name, title, items) => (
+    <div
+      className="nav-dropdown"
+      onMouseEnter={() => setDropdown(name)}
+      onMouseLeave={() => setDropdown("")}
+    >
+      <button
+        type="button"
+        className="nav-dropdown-button"
+        aria-expanded={dropdown === name}
+        onClick={() => setDropdown(dropdown === name ? "" : name)}
+      >
+        {title}
+        <ChevronDown size={15} />
+      </button>
+
+      <div className={`nav-dropdown-menu ${dropdown === name ? "show" : ""}`}>
+        <span className="eyebrow">EXPLORE</span>
+        <h3>{title}</h3>
+
+        {items.map(([label, path], index) => (
+          <Link to={path} key={path} onClick={close}>
+            <span>0{index + 1}</span>
+            {label}
+            <ArrowUpRight size={15} />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
+  const socialLinks = [
+    ["facebook_url", "f"],
+    ["instagram_url", "◎"],
+    ["linkedin_url", "in"],
+    ["github_url", "GH"],
+  ];
+
+  const copyright =
+    settings.footer_copyright?.trim() ||
+    `© ${new Date().getFullYear()} ${settings.brand_name}. All Rights Reserved.`;
+
+  return (
+    <div className={`sh-site ${dark ? "theme-dark" : ""}`} id="top">
+      <header className="sh-header">
+        <div className="sh-header-inner">
+          <Link to="/" className="sh-brand" onClick={close}>
+            {settings.brand_name}<span>.</span>
+          </Link>
+
+          <button
+            type="button"
+            className="mobile-toggle"
+            aria-label="Toggle navigation"
+            onClick={() => setMobile(!mobile)}
+          >
+            {mobile ? <X /> : <Menu />}
+          </button>
+
+          <nav className={`sh-navigation ${mobile ? "menu-open" : ""}`}>
+            {pages.slice(0, 2).map(([label, path]) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/"}
+                onClick={close}
+              >
+                {label}
+              </NavLink>
+            ))}
+
+            {drop("services", "Services", services)}
+
+            <NavLink to="/portfolio" onClick={close}>
+              Portfolio
+            </NavLink>
+
+            {drop("products", "My Products", products)}
+            {drop("tools", "Online Tools", tools)}
+
+            <NavLink to="/contact" onClick={close}>
+              Contact
+            </NavLink>
+          </nav>
+
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-button"
+              aria-label="Change theme"
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <Sun /> : <Moon />}
+            </button>
+
+            <Link to="/contact" className="contact-button">
+              Let's Talk <ArrowUpRight size={17} />
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className="sh-main">
+        <Outlet />
+      </main>
+
+      <footer className="sh-footer">
+        <div className="footer-cta">
+          <div>
+            <span>HAVE A PROJECT IN MIND?</span>
+            <h2>{settings.footer_cta_title}</h2>
+            <p>{settings.footer_cta_text}</p>
+          </div>
+
+          <Link to="/contact">
+            Get In Touch <ArrowUpRight />
+          </Link>
+        </div>
+
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <Link to="/" className="footer-logo">
+              {settings.brand_name}<span>.</span>
+            </Link>
+
+            <h3>{settings.footer_tagline}</h3>
+
+            <p>{settings.footer_description}</p>
+
+            <div className="sh-socials">
+              {socialLinks.map(([key, label]) =>
+                settings[key]?.trim() ? (
+                  <a
+                    key={key}
+                    href={settings[key]}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={key.replace("_url", "")}
+                  >
+                    {label}
+                  </a>
+                ) : null
+              )}
+            </div>
+          </div>
+
+          <div className="footer-column">
+            <h3>Quick Links</h3>
+
+            {pages.map(([name, path]) => (
+              <Link to={path} key={path}>
+                <ArrowRight /> {name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="footer-column">
+            <h3>My Services</h3>
+
+            {services.map(([name, path]) => (
+              <Link to={path} key={path}>
+                <ArrowRight /> {name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="footer-column footer-contact">
+            <h3>Contact Information</h3>
+
+            <p><MapPin /> {settings.footer_location}</p>
+
+            <p>
+              <Mail />
+              {settings.footer_email.includes("@") ? (
+                <a href={`mailto:${settings.footer_email}`}>
+                  {settings.footer_email}
+                </a>
+              ) : settings.footer_email}
+            </p>
+
+            <p>
+              <Phone />
+              {settings.footer_phone}
+            </p>
+
+            <Link to="/contact" className="footer-work">
+              Let's Work Together <ArrowUpRight />
+            </Link>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p>{copyright}</p>
+          <Link to="/admin">Admin Login</Link>
+          <a href="#top">Back to Top ↑</a>
+        </div>
+      </footer>
+    </div>
+  );
+}

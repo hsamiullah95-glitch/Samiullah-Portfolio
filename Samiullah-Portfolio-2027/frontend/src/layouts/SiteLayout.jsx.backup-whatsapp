@@ -1,0 +1,326 @@
+﻿import { useEffect, useState } from "react";
+import { Outlet, NavLink, Link } from "react-router-dom";
+import {
+  ArrowUpRight,
+  ArrowRight,
+  ChevronDown,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
+
+const API = "http://localhost:8001/api/header-footer.php";
+
+const DEFAULT_SETTINGS = {
+  brand_name: "Samiullah Hakimi",
+  footer_tagline: "Web Developer & IT Enthusiast",
+  footer_description:
+    "I build modern websites, web applications, database systems and practical IT solutions.",
+  footer_cta_title: "Let's Build Something Great Together.",
+  footer_cta_text: "Have an idea? Let's turn it into reality.",
+  footer_location: "Kandahar, Afghanistan",
+  footer_email: "Contact through website",
+  footer_phone: "Contact details coming soon",
+  footer_copyright: "",
+  facebook_url: "",
+  instagram_url: "",
+  linkedin_url: "",
+  github_url: "",
+};
+
+const services = [
+  ["Website & UI/UX Design", "/services#website-design"],
+  ["Web Development", "/services#web-development"],
+  ["Networking & IT", "/services#networking-it"],
+  ["Database & Hosting", "/services#database-hosting"],
+];
+
+const products = [
+  ["My Portfolio", "/products/portfolio"],
+  ["Web Applications", "/products/applications"],
+  ["Student Projects", "/products/projects"],
+];
+
+const tools = [
+  ["HTML Tools", "/tools/html"],
+  ["CSS Tools", "/tools/css"],
+  ["JavaScript Tools", "/tools/javascript"],
+  ["Network Tools", "/tools/network"],
+];
+
+const pages = [
+  ["Home", "/"],
+  ["About", "/about"],
+  ["Portfolio", "/portfolio"],
+  ["Contact", "/contact"],
+];
+
+export default function SiteLayout() {
+  const [dark, setDark] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const [dropdown, setDropdown] = useState("");
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadHeaderFooter() {
+      try {
+        const response = await fetch(API, {
+          credentials: "include",
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Could not load website settings.");
+        }
+
+        if (active && result.data) {
+          setSettings({
+            ...DEFAULT_SETTINGS,
+            ...result.data,
+          });
+        }
+      } catch (error) {
+        console.error("Header/Footer settings:", error);
+      }
+    }
+
+    loadHeaderFooter();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const close = () => {
+    setMobile(false);
+    setDropdown("");
+  };
+
+  const drop = (name, title, items) => (
+    <div
+      className="nav-dropdown"
+      onMouseEnter={() => setDropdown(name)}
+      onMouseLeave={() => setDropdown("")}
+    >
+      <button
+        type="button"
+        className="nav-dropdown-button"
+        aria-expanded={dropdown === name}
+        onClick={() => setDropdown(dropdown === name ? "" : name)}
+      >
+        {title}
+        <ChevronDown size={15} />
+      </button>
+
+      <div className={`nav-dropdown-menu ${dropdown === name ? "show" : ""}`}>
+        <span className="eyebrow">EXPLORE</span>
+        <h3>{title}</h3>
+
+        {items.map(([label, path], index) => (
+          <Link to={path} key={path} onClick={close}>
+            <span>0{index + 1}</span>
+            {label}
+            <ArrowUpRight size={15} />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
+  const socialLinks = [
+    {
+      key: "facebook_url",
+      label: "Facebook",
+      icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8z"/></svg>
+    },
+    {
+      key: "instagram_url",
+      label: "Instagram",
+      icon: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg>
+    },
+    {
+      key: "linkedin_url",
+      label: "LinkedIn",
+      icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.2 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM3.5 9h3.4v11.5H3.5zm5.5 0h3.3v1.6h.1A3.7 3.7 0 0 1 15.8 8c3.5 0 4.2 2.3 4.2 5.2v7.3h-3.5V14c0-1.6 0-3-1.9-3s-2.2 1.4-2.2 2.9v6.6H9z"/></svg>
+    },
+    {
+      key: "github_url",
+      label: "GitHub",
+      icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.4-1.1.6-1.3-2.2-.3-4.5-1.1-4.5-5A3.9 3.9 0 0 1 6.7 9c-.1-.3-.5-1.3.1-2.7 0 0 .8-.3 2.8 1.1a9.7 9.7 0 0 1 5.1 0c2-1.4 2.8-1.1 2.8-1.1.6 1.4.2 2.4.1 2.7a3.9 3.9 0 0 1 1.1 2.7c0 3.9-2.3 4.7-4.5 5 .4.3.7.9.7 1.8V21c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"/></svg>
+    }
+  ];
+
+  const copyright =
+    settings.footer_copyright?.trim() ||
+    `© ${new Date().getFullYear()} ${settings.brand_name}. All Rights Reserved.`;
+
+  return (
+    <div className={`sh-site ${dark ? "theme-dark" : ""}`} id="top">
+      <header className="sh-header">
+        <div className="sh-header-inner">
+          <Link to="/" className="sh-brand" onClick={close}>
+            {settings.brand_name}<span>.</span>
+          </Link>
+
+          <button
+            type="button"
+            className="mobile-toggle"
+            aria-label="Toggle navigation"
+            onClick={() => setMobile(!mobile)}
+          >
+            {mobile ? <X /> : <Menu />}
+          </button>
+
+          <nav className={`sh-navigation ${mobile ? "menu-open" : ""}`}>
+            {pages.slice(0, 2).map(([label, path]) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/"}
+                onClick={close}
+              >
+                {label}
+              </NavLink>
+            ))}
+
+            {drop("services", "Services", services)}
+
+            <NavLink to="/portfolio" onClick={close}>
+              Portfolio
+            </NavLink>
+
+            {drop("products", "My Products", products)}
+            {drop("tools", "Online Tools", tools)}
+
+            <NavLink to="/contact" onClick={close}>
+              Contact
+            </NavLink>
+          </nav>
+
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-button"
+              aria-label="Change theme"
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <Sun /> : <Moon />}
+            </button>
+
+            <Link to="/contact" className="contact-button">
+              Let's Talk <ArrowUpRight size={17} />
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className="sh-main">
+        <Outlet />
+      </main>
+
+      <footer className="sh-footer">
+        <div className="footer-cta">
+          <div>
+            <span>HAVE A PROJECT IN MIND?</span>
+            <h2>{settings.footer_cta_title}</h2>
+            <p>{settings.footer_cta_text}</p>
+          </div>
+
+          <Link to="/contact">
+            Get In Touch <ArrowUpRight />
+          </Link>
+        </div>
+
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <Link to="/" className="footer-logo">
+              {settings.brand_name}<span>.</span>
+            </Link>
+
+            <h3>{settings.footer_tagline}</h3>
+
+            <p>{settings.footer_description}</p>
+
+            <div className="sh-socials">
+              {socialLinks.map((social) => {
+                const url = settings[social.key]?.trim();
+                return (
+                  <a
+                    key={social.key}
+                    href={url || undefined}
+                    target={url ? "_blank" : undefined}
+                    rel={url ? "noreferrer" : undefined}
+                    aria-label={social.label}
+                    title={social.label}
+                    className={!url ? "social-disabled" : ""}
+                    onClick={!url ? (event) => event.preventDefault() : undefined}
+                  >
+                    {social.icon}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="footer-column">
+            <h3>Quick Links</h3>
+
+            {pages.map(([name, path]) => (
+              <Link to={path} key={path}>
+                <ArrowRight /> {name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="footer-column">
+            <h3>My Services</h3>
+
+            {services.map(([name, path]) => (
+              <Link to={path} key={path}>
+                <ArrowRight /> {name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="footer-column footer-contact">
+            <h3>Contact Information</h3>
+
+            <p><MapPin /> {settings.footer_location}</p>
+
+            <p>
+              <Mail />
+              {settings.footer_email.includes("@") ? (
+                <a href={`mailto:${settings.footer_email}`}>
+                  {settings.footer_email}
+                </a>
+              ) : settings.footer_email}
+            </p>
+
+            <p>
+              <Phone />
+              {settings.footer_phone}
+            </p>
+
+            <Link to="/contact" className="footer-work">
+              Let's Work Together <ArrowUpRight />
+            </Link>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p>{copyright}</p>
+          <Link to="/admin">Admin Login</Link>
+          <a href="#top">Back to Top ↑</a>
+        </div>
+      </footer>
+    </div>
+  );
+}
+

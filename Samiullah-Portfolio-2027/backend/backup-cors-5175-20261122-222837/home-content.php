@@ -1,0 +1,154 @@
+﻿<?php
+header("Content-Type: application/json; charset=UTF-8");
+
+$allowedOrigins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5177"];
+$origin = $_SERVER["HTTP_ORIGIN"] ?? "";
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: " . $origin);
+    header("Vary: Origin");
+}
+
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, PUT, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(204);
+    exit;
+}
+
+session_start();
+require_once __DIR__ . "/../config/database.php";
+
+function homeResponse($success, $message, $data = null, $status = 200) {
+    http_response_code($status);
+    echo json_encode([
+        "success" => $success,
+        "message" => $message,
+        "data" => $data
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+try {
+    $method = $_SERVER["REQUEST_METHOD"];
+
+    // PUBLIC: LOAD HOME PAGE CONTENT
+    if ($method === "GET") {
+        $stmt = $pdo->prepare(
+            "SELECT setting_value
+             FROM site_settings
+             WHERE setting_key = ?"
+        );
+
+        $stmt->execute(["home_content"]);
+        $saved = $stmt->fetchColumn();
+
+        $content = [];
+
+        if ($saved !== false && $saved !== "") {
+            $decoded = json_decode($saved, true);
+
+            if (is_array($decoded)) {
+                $content = $decoded;
+            }
+        }
+
+        homeResponse(true, "Home page content loaded.", $content);
+    }
+
+    // ADMIN ONLY: SAVE HOME PAGE CONTENT
+    if ($method === "PUT") {
+        if (!isset($_SESSION["admin_id"])) {
+            homeResponse(false, "Unauthorized. Please login first.", null, 401);
+        }
+
+        $input = json_decode(file_get_contents("php://input"), true);
+
+        if (!is_array($input)) {
+            homeResponse(false, "Invalid home page data.", null, 400);
+        }
+
+        $json = json_encode(
+            $input,
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        );
+
+        if ($json === false || strlen($json) > 200000) {
+            homeResponse(false, "Home page data is invalid or too large.", null, 422);
+        }
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO site_settings (setting_key, setting_value)
+             VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)"
+        );
+
+        $stmt->execute(["home_content", $json]);
+
+        homeResponse(true, "Home page content saved successfully.", $input);
+    }
+
+    // ADMIN ONLY: UPLOAD HOME PROFILE IMAGE
+    if ($method === "POST") {
+        if (!isset($_SESSION["admin_id"])) {
+            homeResponse(false, "Unauthorized. Please login first.", null, 401);
+        }
+
+        if (!isset($_FILES["image"]) ||
+            $_FILES["image"]["error"] === UPLOAD_ERR_NO_FILE) {
+            homeResponse(false, "Please select an image.", null, 422);
+        }
+
+        if ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
+            homeResponse(false, "Image upload failed.", null, 422);
+        }
+
+        if ($_FILES["image"]["size"] > 5 * 1024 * 1024) {
+            homeResponse(false, "Image must be smaller than 5 MB.", null, 422);
+        }
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($_FILES["image"]["tmp_name"]);
+
+        $allowed = [
+            "image/jpeg" => "jpg",
+            "image/png" => "png",
+            "image/webp" => "webp"
+        ];
+
+        if (!isset($allowed[$mime])) {
+            homeResponse(false, "Only JPG, PNG and WEBP images are allowed.", null, 422);
+        }
+
+        $uploadDir = __DIR__ . "/../uploads/home/";
+
+        if (!is_dir($uploadDir) &&
+            !mkdir($uploadDir, 0755, true)) {
+            homeResponse(false, "Could not create upload folder.", null, 500);
+        }
+
+        $filename = "home_" . bin2hex(random_bytes(12)) . "." . $allowed[$mime];
+
+        if (!move_uploaded_file(
+            $_FILES["image"]["tmp_name"],
+            $uploadDir . $filename
+        )) {
+            homeResponse(false, "Could not save the image.", null, 500);
+        }
+
+        $imageUrl = "http://localhost:8001/uploads/home/" . $filename;
+
+        homeResponse(true, "Home image uploaded successfully.", [
+            "image" => $imageUrl
+        ]);
+    }
+
+    homeResponse(false, "Method not allowed.", null, 405);
+
+} catch (Throwable $e) {
+    error_log("Home Content API Error: " . $e->getMessage());
+    homeResponse(false, "Home page operation failed. Check PHP error log.", null, 500);
+}
+

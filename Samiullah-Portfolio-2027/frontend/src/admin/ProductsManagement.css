@@ -1,0 +1,177 @@
+.sh-products{padding:26px;color:#20243a}
+.sh-products-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}
+.sh-products-eyebrow,.sh-products-mini-label{font-size:10px;font-weight:800;letter-spacing:1.7px;color:#8175d8}
+.sh-products-heading h2{font-size:27px;margin:7px 0;color:#20243a;font-weight:800;letter-spacing:-.8px}
+.sh-products-heading h2 span{color:#8a78ee}
+.sh-products-heading p{margin:0;color:#8990a4;font-size:13px}
+.sh-products-refresh,.sh-products-cancel{display:flex;align-items:center;gap:8px;border:1px solid #e7e8f1;background:white;border-radius:11px;padding:11px 15px;color:#505675;font-weight:700;cursor:pointer}
+.sh-products-refresh:hover,.sh-products-cancel:hover{border-color:#9182ec;color:#7565dc}
+.sh-products-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
+.sh-products-stat{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #ececf4;border-radius:16px;padding:18px;box-shadow:0 5px 20px #29245a08}
+.sh-products-stat-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:13px}
+.sh-products-stat-icon.purple{background:#f0edff;color:#7968df}
+.sh-products-stat-icon.green{background:#e9f9f0;color:#25a66b}
+.sh-products-stat-icon.amber{background:#fff5e6;color:#e39a34}
+.sh-products-stat small{display:block;color:#8d92a5;font-size:12px;margin-bottom:4px}
+.sh-products-stat strong{font-size:24px;color:#262a40}
+.sh-products-layout{display:grid;grid-template-columns:minmax(280px,.78fr) minmax(0,1.55fr);gap:20px;align-items:start}
+.sh-products-editor,.sh-products-list{background:#fff;border:1px solid #ececf4;border-radius:17px;padding:21px;box-shadow:0 6px 25px #29245a08;min-width:0}
+.sh-products-section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sh-products-section-title h3{font-size:18px;margin:5px 0 0;color:#292d43;font-weight:800}
+.sh-products-editor form{display:flex;flex-direction:column;gap:9px}
+.sh-products-editor form label{font-size:12px;font-weight:750;color:#50566e;margin-top:7px}
+.sh-products-editor form label span{font-weight:400;color:#a0a4b3}
+.sh-products-editor input,.sh-products-editor select,.sh-products-editor textarea{width:100%;box-sizing:border-box;border:1px solid #e7e8f0;background:#fbfbfd;border-radius:10px;padding:12px 13px;font:inherit;font-size:13px;color:#30344a;outline:none;transition:.2s}
+.sh-products-editor input:focus,.sh-products-editor select:focus,.sh-products-editor textarea:focus{border-color:#9586ed;background:#fff;box-shadow:0 0 0 3px #9586ed1c}
+.sh-products-editor textarea{resize:vertical;min-height:95px}
+.sh-products-upload{min-height:105px;border:1.5px dashed #d8d5ef;border-radius:12px;background:#faf9ff;display:flex;align-items:center;gap:13px;padding:12px;cursor:pointer;overflow:hidden}
+.sh-products-upload:hover{border-color:#8d7ce8;background:#f6f4ff}
+.sh-products-upload-icon{width:44px;height:44px;display:grid;place-items:center;background:#eeebff;color:#7868df;border-radius:12px;flex-shrink:0}
+.sh-products-upload img{width:75px;height:75px;object-fit:cover;border-radius:9px}
+.sh-products-upload strong,.sh-products-upload small{display:block}
+.sh-products-upload strong{font-size:12px;color:#4c4a70}
+.sh-products-upload small{font-size:10px;color:#9699aa;margin-top:6px}
+.sh-products-submit{display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:11px;background:linear-gradient(110deg,#7765df,#9b72e9);color:white;font-weight:800;font-size:13px;padding:14px;margin-top:12px;cursor:pointer;box-shadow:0 7px 16px #8672df35;transition:.2s}
+.sh-products-submit:hover{transform:translateY(-2px);box-shadow:0 10px 20px #8672df45}
+.sh-products-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.sh-products-count{display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:8px;background:#f0edff;color:#7766df;font-size:11px;vertical-align:middle}
+.sh-products-toolbar{display:flex;gap:10px;margin-bottom:17px}
+.sh-products-search{display:flex;align-items:center;gap:8px;flex:1;min-width:0;border:1px solid #e8e8f0;background:#fbfbfd;border-radius:10px;padding:0 11px;color:#9698aa}
+.sh-products-search input{border:0;outline:0;background:transparent;width:100%;min-width:0;padding:11px 0;font:inherit;font-size:12px;color:#34384d}
+.sh-products-toolbar select{border:1px solid #e8e8f0;border-radius:10px;background:#fbfbfd;padding:0 10px;color:#555b70;font-size:12px;max-width:125px}
+.sh-products-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.sh-product-card{border:1px solid #ededf3;border-radius:13px;overflow:hidden;min-width:0;transition:.22s;background:white}
+.sh-product-card:hover{transform:translateY(-3px);box-shadow:0 9px 24px #28234b12;border-color:#ded9fa}
+.sh-product-image{height:145px;background:#f4f3fa;position:relative;overflow:hidden}
+.sh-product-image>img{width:100%;height:100%;object-fit:cover;display:block}
+.sh-product-no-image{width:100%;height:100%;display:grid;place-items:center;color:#aaa5c8}
+.sh-product-status{position:absolute;top:10px;right:10px;border-radius:20px;padding:5px 9px;font-size:9px;font-weight:800}
+.sh-product-status.is-active{background:#e5f8ed;color:#23935c}
+.sh-product-status.is-inactive{background:#fff0e9;color:#d56b43}
+.sh-product-card-body{padding:13px}
+.sh-product-category{font-size:9px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:#8878dd}
+.sh-product-card h4{font-size:14px;color:#2d3046;margin:7px 0;font-weight:800;overflow-wrap:anywhere}
+.sh-product-card p{font-size:11px;line-height:1.6;color:#888da0;margin:0 0 13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px}
+.sh-product-actions{display:flex;align-items:center;gap:7px;border-top:1px solid #f0f0f5;padding-top:10px}
+.sh-product-actions button,.sh-product-actions a{height:31px;min-width:31px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border:1px solid #ececf2;border-radius:8px;background:white;color:#73788c;cursor:pointer;text-decoration:none;font-size:11px}
+.sh-product-actions .edit{padding:0 9px;color:#7766d9;background:#f6f4ff;border-color:#eeeaff;font-weight:700}
+.sh-product-actions .visibility{margin-left:auto}
+.sh-product-actions .delete{color:#dc6b72}
+.sh-product-actions button:hover,.sh-product-actions a:hover{border-color:#bcb2f2;background:#f7f5ff}
+.sh-products-empty{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#9296a8}
+.sh-products-empty>span{width:58px;height:58px;border-radius:18px;background:#f1efff;color:#8a7ae1;display:grid;place-items:center}
+.sh-products-empty h4{margin:13px 0 4px;color:#42465c}
+.sh-products-empty p{font-size:12px;margin:0}
+.sh-products-loader{width:27px;height:27px;border:3px solid #e8e5fa;border-top-color:#8675e5;border-radius:50%;animation:shProductSpin .8s linear infinite}
+@keyframes shProductSpin{to{transform:rotate(360deg)}}
+.sh-products-alert{display:flex;align-items:center;gap:9px;padding:12px 14px;border-radius:10px;margin-bottom:15px;font-size:12px;font-weight:650}
+.sh-products-alert button{margin-left:auto;border:0;background:transparent;cursor:pointer;color:inherit;display:grid;place-items:center}
+.sh-products-alert.success{background:#eaf8f0;color:#238557}
+.sh-products-alert.danger{background:#fff0ef;color:#c64d52}
+@media(max-width:1100px){.sh-products-layout{grid-template-columns:1fr}.sh-products-editor{max-width:none}}
+@media(max-width:650px){.sh-products{padding:15px}.sh-products-heading{align-items:flex-start}.sh-products-heading h2{font-size:22px}.sh-products-stats{gap:8px}.sh-products-stat{padding:12px 9px;gap:8px}.sh-products-stat-icon{width:34px;height:34px}.sh-products-stat small{font-size:9px}.sh-products-stat strong{font-size:19px}.sh-products-grid{grid-template-columns:1fr}.sh-products-editor,.sh-products-list{padding:15px}.sh-products-toolbar{flex-wrap:wrap}.sh-products-search{flex-basis:100%}.sh-products-toolbar select{height:36px;max-width:none;width:100%}}
+/* =====================================
+   PRODUCTS ADMIN FONT FIX
+===================================== */
+
+.sh-products,
+.sh-products *,
+.sh-products input,
+.sh-products select,
+.sh-products textarea,
+.sh-products button {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+}
+
+.sh-products-heading h2,
+.sh-products-section-title h3,
+.sh-product-card h4 {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 800;
+}
+
+.sh-products-editor form label {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 700;
+}
+
+.sh-products-editor input,
+.sh-products-editor select,
+.sh-products-editor textarea,
+.sh-products-search input,
+.sh-products-toolbar select {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.sh-products button,
+.sh-products-submit {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 700;
+}
+
+.sh-product-card p,
+.sh-products-heading p {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    line-height: 1.9;
+}
+
+.sh-products {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+
+/* =====================================
+   PRODUCTS ADMIN FONT FIX
+===================================== */
+
+.sh-products,
+.sh-products *,
+.sh-products input,
+.sh-products select,
+.sh-products textarea,
+.sh-products button {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+}
+
+.sh-products-heading h2,
+.sh-products-section-title h3,
+.sh-product-card h4 {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 800;
+}
+
+.sh-products-editor form label {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 700;
+}
+
+.sh-products-editor input,
+.sh-products-editor select,
+.sh-products-editor textarea,
+.sh-products-search input,
+.sh-products-toolbar select {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.sh-products button,
+.sh-products-submit {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    font-weight: 700;
+}
+
+.sh-product-card p,
+.sh-products-heading p {
+    font-family: "Noto Sans Arabic", "Tahoma", sans-serif;
+    line-height: 1.9;
+}
+
+.sh-products {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
